@@ -38,6 +38,10 @@ android {
 dependencies {
 
     implementation(libs.activity)
+    implementation(libs.support.annotations)
+    implementation(libs.annotation)
+    implementation(libs.support.annotations)
+    implementation(libs.annotation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -51,4 +55,9 @@ dependencies {
 
     implementation ("androidx.appcompat:appcompat:1.6.1")
     implementation("com.github.florent37:diagonallayout:1.0.7")
+
+    implementation("com.makeramen:roundedimageview:2.3.0")
+
+    implementation("com.google.android.material:material:1.12.0")
+
 }
