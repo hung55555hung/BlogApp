@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.6.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -22,4 +22,4 @@ support-annotations = { group = "com.android.support", name = "support-annotatio
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
+android-application = { id = "com.android.application", version = "8.6.0" }
