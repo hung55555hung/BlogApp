@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                         .replace(R.id.fragment_container, selectedFragment)
                         .commit();
             }
+            bottomNavigationView.setVisibility(View.VISIBLE);
             return true;
         });
         if (savedInstanceState == null) {
