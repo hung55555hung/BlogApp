@@ -1,66 +1,194 @@
 package com.bugbug.blogapp.Fragment;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.R;
+import com.bugbug.blogapp.Util.CloudinaryUtil;
+import com.bugbug.blogapp.databinding.FragmentAddBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.Date;
+
+
 public class AddFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    FragmentAddBinding binding;
+    BottomNavigationView bottomNav;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
+    Uri uri;
+    FirebaseDatabase database;
     public AddFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AddFragment newInstance(String param1, String param2) {
-        AddFragment fragment = new AddFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        database=FirebaseDatabase.getInstance();
+
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        uri = result.getData().getData();
+                        binding.imagePost.setImageURI(uri);
+                        binding.postBtn.setEnabled(true);
+                        binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.followed_btn));
+                        binding.postBtn.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                    }
+                }
+        );
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add, container, false);
+        database.getReference().child("Users")
+                        .child("aaa").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+        binding = FragmentAddBinding.inflate(inflater, container, false);
+
+        binding.postDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String descriptionPost=binding.postDescription.getText().toString();
+                if(!descriptionPost.isEmpty()) {
+                    binding.postBtn.setEnabled(true);
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.followed_btn));
+                    binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.white));
+                }else{
+                    binding.postBtn.setEnabled(false);
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_active_btn));
+                    binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.gray));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        binding.btnAddImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                imagePickerLauncher.launch(intent);
+            }
+        });
+        binding.postBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(uri!=null){
+                    CloudinaryUtil.uploadImage(getContext(), uri, new CloudinaryUtil.UploadResultListener() {
+                        @Override
+                        public void onSuccess(String imageUrl) {
+                            if (imageUrl != null) {
+                                Post post = new Post();
+                                post.setPostImage(imageUrl);
+                                post.setPostedBy("aaa");
+                                post.setPostDescription(binding.postDescription.getText().toString());
+                                post.setPostedAt(new Date().getTime());
+                                database.getReference().child("Posts")
+                                        .push()
+                                        .setValue(post)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                if (isAdded()) {
+                                                    Toast.makeText(requireContext(), "Posting successfully", Toast.LENGTH_SHORT).show();
+                                                }
+                                                bottomNav.setSelectedItemId(R.id.nav_home);
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            if (isAdded()) {
+                                Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                bottomNav.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+                }else{
+                    Post post=new Post();
+                    post.setPostImage("");
+                    post.setPostedBy("aaa");
+                    post.setPostDescription(binding.postDescription.getText().toString());
+                    post.setPostedAt(new Date().getTime());
+                    database.getReference().child("Posts")
+                            .push()
+                            .setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    if (isAdded()) {
+                                        Toast.makeText(requireContext(), "Posting successfully", Toast.LENGTH_SHORT).show();
+                                    }
+                                    bottomNav.setSelectedItemId(R.id.nav_home);
+                                }
+                            });
+
+                }
+            }
+        });
+        return  binding.getRoot();
     }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
+            View rootView = binding.getRoot();
+            rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                if (!isAdded()){
+                    bottomNav.setVisibility(View.VISIBLE);
+                    return;
+                }
+                int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
+
+                if (heightDiff > getResources().getDisplayMetrics().density*200) {
+                    bottomNav.setVisibility(View.GONE);
+                } else {
+                    bottomNav.setVisibility(View.VISIBLE);
+                }
+            });
+        }
 }

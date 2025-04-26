@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -42,6 +43,8 @@ dependencies {
     implementation(libs.annotation)
     implementation(libs.support.annotations)
     implementation(libs.annotation)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -59,6 +62,7 @@ dependencies {
     implementation("com.makeramen:roundedimageview:2.3.0")
 
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
 
     implementation ("com.squareup.picasso:picasso:2.8")
 
