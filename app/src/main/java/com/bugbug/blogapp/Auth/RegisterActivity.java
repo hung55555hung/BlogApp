@@ -14,77 +14,64 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
+import com.bugbug.blogapp.databinding.ActivityMainBinding;
+import com.bugbug.blogapp.databinding.ActivityRegisterBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
+    ActivityRegisterBinding binding;
 
-    private EditText etEmail, etPassword, etPasswordAgain;
-    private Button btnLogin;
-    private TextView tvRegister;
     private FirebaseAuth mAuth;
-
+    private FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_register);
+        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Ánh xạ view
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        etPasswordAgain = findViewById(R.id.etPasswordAgain);
-        btnLogin = findViewById(R.id.btnLogin);
-        tvRegister = findViewById(R.id.tvRegister);
-
-        // Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-
-        // Bắt sự kiện khi bấm nút LOGIN (ở đây là nút Đăng ký)
-        btnLogin.setText("REGISTER"); // đổi chữ LOGIN thành REGISTER
-        btnLogin.setOnClickListener(v -> registerUser());
-
-        // Bấm vào "Register!" sẽ quay lại màn Login
-        tvRegister.setOnClickListener(v -> {
-            finish(); // Quay lại LoginActivity
-        });
+        database=FirebaseDatabase.getInstance();
+        binding.btnLogin.setOnClickListener(v -> registerUser());
+        binding.tvRegister.setOnClickListener(v -> {finish();});
     }
 
     private void registerUser() {
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        String passwordAgain = etPasswordAgain.getText().toString().trim();
+        String name=binding.etName.getText().toString().trim();
+        String email = binding.etEmail.getText().toString().trim();
+        String password = binding.etPassword.getText().toString().trim();
+        String passwordAgain = binding.etPasswordAgain.getText().toString().trim();
 
-        // Kiểm tra nhập liệu
-        if (email.isEmpty() || password.isEmpty() || passwordAgain.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+        if ( name.isEmpty() || email.isEmpty() || password.isEmpty() || passwordAgain.isEmpty()) {
+            Toast.makeText(this, "Please fill in all the required information.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        if (!password.equals(passwordAgain)) {
-            Toast.makeText(this, "Mật khẩu không trùng khớp", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         if (password.length() < 6) {
-            Toast.makeText(this, "Mật khẩu phải từ 6 ký tự trở lên", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Password must be at least 6 characters long.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Gọi Firebase để tạo tài khoản
+        if (!password.equals(passwordAgain)) {
+            Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                        finish(); // Đăng ký xong, quay về màn Login
+                        String id=task.getResult().getUser().getUid();
+                        User user=new User(id,name,"", email, password,"","");
+                        database.getReference().child("Users")
+                                        .child(id).setValue(user);
+                        Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
-                        Toast.makeText(RegisterActivity.this, "Đăng ký thất bại. Thử lại!", Toast.LENGTH_SHORT).show();
+                        String errorMessage = task.getException().getMessage();
+                        if (errorMessage.contains("The email address is already in use")) {
+                            Toast.makeText(RegisterActivity.this, "Email is already registered.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }

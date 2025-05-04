@@ -8,9 +8,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
-        android:layout_width="@dimen/_60mdp"
-        android:layout_height="@dimen/_60mdp"
-        android:layout_marginStart="16dp"
+        android:layout_width="@dimen/_50mdp"
+        android:layout_height="@dimen/_50mdp"
         android:layout_marginTop="8dp"
         android:src="@drawable/avt"
         app:civ_border_width="2dp"
@@ -42,7 +41,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="10dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/profile_image"
@@ -53,10 +52,10 @@
             android:id="@+id/followBtn"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:background="@drawable/follow_btn_bg"
+            android:background="@drawable/follow_btn"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="FOLLOW"
+            android:text="Follow"
             android:textColor="@color/white" />
     </androidx.cardview.widget.CardView>
 

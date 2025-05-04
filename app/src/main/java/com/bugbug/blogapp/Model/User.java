@@ -1,23 +1,26 @@
 package com.bugbug.blogapp.Model;
 
 public class User {
+    private String userID;
     private String name;
     private String profession;
     private String email;
     private String password;
     private String coverPhoto;
-    private String profile;
+    private String bio;
+    private int numberFollower;
      public User() {
 
      }
 
-    public User(String name, String profession, String password, String email, String coverPhoto, String profile) {
+    public User(String userID,String name, String profession, String email,String password, String coverPhoto, String bio) {
+         this.userID=userID;
         this.name = name;
         this.profession = profession;
         this.password = password;
         this.email = email;
         this.coverPhoto = coverPhoto;
-        this.profile = profile;
+        this.bio = bio;
     }
 
     public String getName() {
@@ -60,11 +63,27 @@ public class User {
         this.coverPhoto = coverPhoto;
     }
 
-    public String getProfile() {
-        return profile;
+    public String getBio() {
+        return bio;
     }
 
-    public void setProfile(String profile) {
-        this.profile = profile;
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public int getNumberFollower() {
+        return numberFollower;
+    }
+
+    public void setNumberFollower(int numberFollower) {
+        this.numberFollower = numberFollower;
     }
 }

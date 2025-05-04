@@ -9,16 +9,17 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bugbug.blogapp.Model.FriendModel;
+import com.bugbug.blogapp.Model.Follow;
 import com.bugbug.blogapp.R;
+import com.bugbug.blogapp.databinding.FriendRvBinding;
 
 import java.util.ArrayList;
 
-public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder> {
-    ArrayList<FriendModel> list;
+public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.ViewHolder> {
+    ArrayList<Follow> list;
     Context context;
 
-    public FriendAdapter(ArrayList<FriendModel> list, Context context) {
+    public FollowAdapter(ArrayList<Follow> list, Context context) {
         this.list = list;
         this.context = context;
     }
@@ -32,8 +33,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        FriendModel model=list.get(position);
-        holder.profile.setImageResource(model.getProfile());
+        Follow model=list.get(position);
     }
 
     @Override
@@ -42,10 +42,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        ImageView profile;
+        FriendRvBinding binding;
         public ViewHolder(@NonNull View itemView){
             super(itemView);
-            profile=itemView.findViewById(R.id.profile_image);
+            binding = FriendRvBinding.bind(itemView);
         }
     }
 }

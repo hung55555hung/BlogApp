@@ -39,7 +39,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- MainActivity không còn MAIN nữa -->
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="false" />

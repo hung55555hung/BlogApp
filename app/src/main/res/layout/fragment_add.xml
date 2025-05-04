@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/follow_active_btn"
+        android:background="@drawable/following_btn"
         android:text="Post"
         android:fontFamily="sans-serif"
         android:textStyle="bold"
@@ -85,7 +85,7 @@
                     app:layout_constraintVertical_bias="0.0" />
 
                 <TextView
-                    android:id="@+id/about"
+                    android:id="@+id/profession"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Travler, Life Lover"

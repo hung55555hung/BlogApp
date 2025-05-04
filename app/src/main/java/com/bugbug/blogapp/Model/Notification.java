@@ -1,10 +1,10 @@
 package com.bugbug.blogapp.Model;
 
-public class NotificationModel {
+public class Notification {
     int profile;
     String notification,time;
 
-    public NotificationModel(int profile, String notification, String time) {
+    public Notification(int profile, String notification, String time) {
         this.profile = profile;
         this.notification = notification;
         this.time = time;

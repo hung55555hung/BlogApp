@@ -8,4 +8,5 @@
 
     <color name="colorBackground">#FFFFFF</color>     <!-- Nền chung toàn app -->
     <color name="colorOnBackground">#000000</color>
+    <color name="colorApp">#4C94F4</color>
 </resources>
