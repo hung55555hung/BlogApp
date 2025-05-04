@@ -1,4 +1,4 @@
-package com.bugbug.blogapp;
+package com.bugbug.blogapp.Activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +10,7 @@ import com.bugbug.blogapp.Fragment.HomeFragment;
 import com.bugbug.blogapp.Fragment.NotificationFragment;
 import com.bugbug.blogapp.Fragment.ProfileFragment;
 import com.bugbug.blogapp.Fragment.SearchFragment;
+import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

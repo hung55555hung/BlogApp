@@ -1,22 +1,12 @@
-package com.bugbug.blogapp.Auth;
+package com.bugbug.blogapp.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.bugbug.blogapp.MainActivity;
-import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityLoginBinding;
-import com.bugbug.blogapp.databinding.ActivityRegisterBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
