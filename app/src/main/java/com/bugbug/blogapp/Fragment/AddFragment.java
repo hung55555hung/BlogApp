@@ -21,15 +21,19 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bugbug.blogapp.Model.Post;
+import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.Util.CloudinaryUtil;
 import com.bugbug.blogapp.databinding.FragmentAddBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 
@@ -39,7 +43,9 @@ public class AddFragment extends Fragment {
     BottomNavigationView bottomNav;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     Uri uri;
-    FirebaseDatabase database;
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
     public AddFragment() {
     }
 
@@ -48,6 +54,8 @@ public class AddFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         database=FirebaseDatabase.getInstance();
+        mAuth=FirebaseAuth.getInstance();
+        currentUser=mAuth.getCurrentUser();
 
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -68,11 +76,25 @@ public class AddFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         database.getReference().child("Users")
-                        .child("aaa").addListenerForSingleValueEvent(new ValueEventListener() {
+                        .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user=snapshot.getValue(User.class);
+                        binding.userName.setText(user.getName());
+                        binding.profession.setText(user.getProfession());
+                        String coverPhoto = user.getCoverPhoto();
+                        if (coverPhoto == null || coverPhoto.isEmpty()) {
+                            Picasso.get()
+                                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
+                                    .placeholder(R.drawable.avt)
+                                    .into(binding.profileImage);
+                        } else {
+                            Picasso.get()
+                                    .load(coverPhoto)
+                                    .placeholder(R.drawable.avt)
+                                    .into(binding.profileImage);
+                        }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                     }
@@ -121,7 +143,7 @@ public class AddFragment extends Fragment {
                             if (imageUrl != null) {
                                 Post post = new Post();
                                 post.setPostImage(imageUrl);
-                                post.setPostedBy("aaa");
+                                post.setPostedBy(currentUser.getUid());
                                 post.setPostDescription(binding.postDescription.getText().toString());
                                 post.setPostedAt(new Date().getTime());
                                 database.getReference().child("Posts")
@@ -150,7 +172,7 @@ public class AddFragment extends Fragment {
                 }else{
                     Post post=new Post();
                     post.setPostImage("");
-                    post.setPostedBy("aaa");
+                    post.setPostedBy(currentUser.getUid());
                     post.setPostDescription(binding.postDescription.getText().toString());
                     post.setPostedAt(new Date().getTime());
                     database.getReference().child("Posts")

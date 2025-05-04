@@ -22,6 +22,8 @@ import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.FragmentAddBinding;
 import com.bugbug.blogapp.databinding.FragmentSearchBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -31,7 +33,7 @@ import java.util.ArrayList;
 
 
 public class SearchFragment extends Fragment {
-    private static final long DEBOUNCE_DELAY = 1000;
+    private static final long DEBOUNCE_DELAY = 600;
 
     FragmentSearchBinding binding;
     BottomNavigationView bottomNav;
@@ -62,11 +64,10 @@ public class SearchFragment extends Fragment {
         binding = FragmentSearchBinding.inflate(inflater, container, false);
 
         userAdapter = new UserAdapter(list, getContext());
+        recyclerView = binding.userRV;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setNestedScrollingEnabled(false);
-
-        recyclerView = binding.userRV;
         recyclerView.setAdapter(userAdapter);
 
         binding.searchBar.addTextChangedListener(new TextWatcher() {
@@ -75,7 +76,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String keyword=s.toString().toLowerCase();
+                String keyword=s.toString();
 
                 if (searchRunnable != null) {
                     handler.removeCallbacks(searchRunnable);
@@ -98,15 +99,6 @@ public class SearchFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-//        list.add(new User("John Doe", "Lorem ipsum.","","", "https://example.com/profile1.jpg","hello"));
-//        list.add(new User("Jane Smith", "Lorem ipsum.","","", "https://example.com/profile2.jpg","hello"));
-//        list.add(new User("Alice Johnson", "Lorem ipsum.","","", "https://example.com/profile3.jpg","hello"));
-//        list.add(new User("Bob Brown", "Lorem ipsum.","","", "https://example.com/profile4.jpg","hello"));
-//        list.add(new User("Charlie Davis", "Lorem ipsum.","","", "https://example.com/profile5.jpg","hello"));
-//        list.add(new User("David Wilson", "Lorem ipsum.","","", "https://example.com/profile6.jpg","hello"));
-
-
         return binding.getRoot();
     }
 

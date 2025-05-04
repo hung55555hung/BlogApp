@@ -15,6 +15,8 @@ import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.UserSampleBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -28,6 +30,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     Context context;
     ArrayList<User> list;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
     public UserAdapter(ArrayList<User> list, Context context) {
         this.context = context;
         this.list = list;
@@ -36,19 +40,32 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
        View view = LayoutInflater.from(context).inflate(com.bugbug.blogapp.R.layout.user_sample, parent, false);
+        mAuth=FirebaseAuth.getInstance();
+        currentUser=mAuth.getCurrentUser();
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User user = list.get(position);
-        Picasso.get().load(user.getProfile()).placeholder(R.drawable.avt).into(holder.binding.profileImage);
+        String coverPhoto = user.getCoverPhoto();
+        if (coverPhoto == null || coverPhoto.isEmpty()) {
+            Picasso.get()
+                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
+                    .placeholder(R.drawable.avt)
+                    .into(holder.binding.profileImage);
+        } else {
+            Picasso.get()
+                    .load(coverPhoto)
+                    .placeholder(R.drawable.avt)
+                    .into(holder.binding.profileImage);
+        }
         holder.binding.name.setText(user.getName());
         holder.binding.profession.setText(user.getProfession());
 
         FirebaseDatabase.getInstance().getReference().child("Users")
                         .child(user.getUserID()).child("followers")
-                        .child(user.getUserID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()){
@@ -69,13 +86,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private void handleFollow(User user){
         Follow follow=new Follow();
-        follow.setFollowBy("aaaa");
+        follow.setFollowBy(currentUser.getUid());
         follow.setFollowAt(new Date().getTime());
 
         FirebaseDatabase.getInstance().getReference().child("Users")
                 .child(user.getUserID())
                 .child("followers")
-                .child("aaa")
+                .child(currentUser.getUid())
                 .setValue(follow).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -95,7 +112,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         FirebaseDatabase.getInstance().getReference().child("Users")
                 .child(user.getUserID())
                 .child("followers")
-                .child("aaa")
+                .child(currentUser.getUid())
                 .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {

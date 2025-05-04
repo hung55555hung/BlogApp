@@ -11,14 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bugbug.blogapp.Adapter.NotificationAdapter;
-import com.bugbug.blogapp.Model.NotificationModel;
+import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.R;
 
 import java.util.ArrayList;
 
 public class SubNotificationFragment extends Fragment {
     RecyclerView recyclerView;
-    ArrayList<NotificationModel> list;
+    ArrayList<Notification> list;
 
     public SubNotificationFragment() {
         // Required empty public constructor
@@ -38,11 +38,11 @@ public class SubNotificationFragment extends Fragment {
         View view= inflater.inflate(R.layout.fragment_sub_notification, container, false);
         recyclerView=view.findViewById(R.id.notification_rv);
         list=new ArrayList<>();
-        list.add(new NotificationModel(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
-        list.add(new NotificationModel(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
-        list.add(new NotificationModel(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
-        list.add(new NotificationModel(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
-        list.add(new NotificationModel(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
+        list.add(new Notification(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
+        list.add(new Notification(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
+        list.add(new Notification(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
+        list.add(new Notification(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
+        list.add(new Notification(R.drawable.avt,"<b>Ethan Carter</b> liked your picture","Just now"));
         NotificationAdapter adapter=new NotificationAdapter(list,getContext());
         LinearLayoutManager layoutManager=new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
