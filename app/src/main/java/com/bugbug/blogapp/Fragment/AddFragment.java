@@ -9,7 +9,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -57,7 +56,7 @@ public class AddFragment extends Fragment {
                         uri = result.getData().getData();
                         binding.imagePost.setImageURI(uri);
                         binding.postBtn.setEnabled(true);
-                        binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.followed_btn));
+                        binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_btn));
                         binding.postBtn.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
                     }
                 }
@@ -91,11 +90,11 @@ public class AddFragment extends Fragment {
                 String descriptionPost=binding.postDescription.getText().toString();
                 if(!descriptionPost.isEmpty()) {
                     binding.postBtn.setEnabled(true);
-                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.followed_btn));
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_btn));
                     binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.white));
                 }else{
                     binding.postBtn.setEnabled(false);
-                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.follow_active_btn));
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.following_btn));
                     binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.gray));
                 }
             }
@@ -172,23 +171,23 @@ public class AddFragment extends Fragment {
         return  binding.getRoot();
     }
 
-        @Override
-        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
-            View rootView = binding.getRoot();
-            rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                if (!isAdded()){
-                    bottomNav.setVisibility(View.VISIBLE);
-                    return;
-                }
-                int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
+        View rootView = binding.getRoot();
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            if (!isAdded()){
+                bottomNav.setVisibility(View.VISIBLE);
+                return;
+            }
+            int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
 
-                if (heightDiff > getResources().getDisplayMetrics().density*200) {
-                    bottomNav.setVisibility(View.GONE);
-                } else {
-                    bottomNav.setVisibility(View.VISIBLE);
-                }
-            });
-        }
+            if (heightDiff > getResources().getDisplayMetrics().density*200) {
+                bottomNav.setVisibility(View.GONE);
+            } else {
+                bottomNav.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 }
