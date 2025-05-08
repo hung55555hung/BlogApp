@@ -1,6 +1,8 @@
 package com.bugbug.blogapp.Model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String userID;
     private String name;
     private String profession;
@@ -9,9 +11,7 @@ public class User {
     private String coverPhoto;
     private String bio;
     private int numberFollower;
-     public User() {
-
-     }
+    public User() {}
 
     public User(String userID,String name, String profession, String email,String password, String coverPhoto, String bio) {
          this.userID=userID;
