@@ -116,7 +116,7 @@ public class AddFragment extends Fragment {
                     binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.white));
                 }else{
                     binding.postBtn.setEnabled(false);
-                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.following_btn));
+                    binding.postBtn.setBackgroundDrawable(ContextCompat.getDrawable(getContext(), R.drawable.non_activate_btn));
                     binding.postBtn.setTextColor(getContext().getResources().getColor(R.color.gray));
                 }
             }

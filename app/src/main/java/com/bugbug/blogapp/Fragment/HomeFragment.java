@@ -13,6 +13,7 @@ import com.bugbug.blogapp.Adapter.StoryAdapter;
 import com.bugbug.blogapp.Model.DasboardModel;
 import com.bugbug.blogapp.Model.StoryModel;
 import com.bugbug.blogapp.R;
+
 import java.util.ArrayList;
 
 
@@ -21,7 +22,6 @@ public class HomeFragment extends Fragment {
     RecyclerView storyRecyclerView, dasboardRecyclerView;
     ArrayList<StoryModel> storyList;
     ArrayList<DasboardModel> dasboardList;
-
 
     public HomeFragment() {
 
@@ -40,7 +40,7 @@ public class HomeFragment extends Fragment {
         storyRecyclerView = view.findViewById(R.id.storyRV);
         storyList = new ArrayList<>();
         storyList.add(new StoryModel(R.drawable.im1, R.drawable.ic_live, R.drawable.avt, "John Doe"));
-        storyList.add(new StoryModel(R.drawable.avatar_image, R.drawable.ic_live, R.drawable.avt, "John Doe"));
+        storyList.add(new StoryModel(R.drawable.avatar_default, R.drawable.ic_live, R.drawable.avt, "John Doe"));
         storyList.add(new StoryModel(R.drawable.avt, R.drawable.ic_live, R.drawable.avt, "John Doe"));
         StoryAdapter storyAdapter = new StoryAdapter(storyList, getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
