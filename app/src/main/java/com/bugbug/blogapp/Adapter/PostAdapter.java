@@ -97,10 +97,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         if (user.getCoverPhoto() != null && !user.getCoverPhoto().isEmpty()) {
                             Picasso.get()
                                     .load(user.getCoverPhoto())
-                                    .placeholder(R.drawable.avatar_image)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.profileImage);
                         } else {
-                            binding.profileImage.setImageResource(R.drawable.avatar_image);
+                            binding.profileImage.setImageResource(R.drawable.avatar_default);
                         }
                         binding.userName.setText(user.getName());
                         binding.bio.setText(user.getProfession());

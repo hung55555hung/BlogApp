@@ -102,10 +102,10 @@ public class CommentActivity extends AppCompatActivity {
                         if (coverPhoto != null && !coverPhoto.isEmpty()) {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avatar_image)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.profileImage);
                         } else {
-                            binding.profileImage.setImageResource(R.drawable.avatar_image);
+                            binding.profileImage.setImageResource(R.drawable.avatar_default);
                         }
 
                         binding.name.setText(name);
