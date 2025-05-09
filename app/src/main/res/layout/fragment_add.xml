@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/following_btn"
+        android:background="@drawable/non_activate_btn"
         android:text="Post"
         android:fontFamily="sans-serif"
         android:textStyle="bold"

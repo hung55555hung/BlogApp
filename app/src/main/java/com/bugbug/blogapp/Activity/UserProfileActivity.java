@@ -1,0 +1,163 @@
+package com.bugbug.blogapp.Activity;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.bugbug.blogapp.Model.Follow;
+import com.bugbug.blogapp.Model.User;
+import com.bugbug.blogapp.R;
+import com.bugbug.blogapp.databinding.ActivityUserProfileBinding;
+import com.bugbug.blogapp.databinding.DialogUnfollowBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import java.util.Date;
+
+public class UserProfileActivity extends AppCompatActivity {
+
+    ActivityUserProfileBinding binding;
+    FirebaseDatabase database;
+    FirebaseAuth mAuth;
+    FirebaseUser currentUser;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding=ActivityUserProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        database=FirebaseDatabase.getInstance();
+        mAuth=FirebaseAuth.getInstance();
+        currentUser=mAuth.getCurrentUser();
+
+        User user=(User) getIntent().getSerializableExtra("user");
+        database.getReference().child("Users")
+                .child(user.getUserID()).child("followers")
+                .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            binding.followBtn.setVisibility(View.GONE);
+                            binding.followingBtn.setVisibility(View.VISIBLE);
+                            binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user));
+                        } else {
+                            binding.followBtn.setVisibility(View.VISIBLE);
+                            binding.followingBtn.setVisibility(View.GONE);
+                            binding.followBtn.setOnClickListener(v -> handleFollow(user));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+        String coverPhoto = user.getCoverPhoto();
+        if (coverPhoto == null || coverPhoto.isEmpty()) {
+            Picasso.get()
+                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
+                    .placeholder(R.drawable.avt)
+                    .into(binding.avatarImg);
+        } else {
+            Picasso.get()
+                    .load(coverPhoto)
+                    .placeholder(R.drawable.avt)
+                    .into(binding.avatarImg);
+        }
+        binding.tvName.setText(user.getName());
+        binding.tvFullName.setText(user.getName());
+        binding.tvProfession.setText(user.getProfession());
+        binding.tvBio.setText(user.getBio());
+        binding.tvFollower.setText(user.getNumberFollower()+"");
+        binding.tvPostBy.setText("Posts by "+user.getName());
+        binding.btnReturn.setOnClickListener(v->{finish();});
+    }
+
+    private void handleFollow(User user){
+        Follow follow=new Follow();
+        follow.setFollowBy(currentUser.getUid());
+        follow.setFollowAt(new Date().getTime());
+
+        FirebaseDatabase.getInstance().getReference().child("Users")
+                .child(user.getUserID())
+                .child("followers")
+                .child(currentUser.getUid())
+                .setValue(follow).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        FirebaseDatabase.getInstance().getReference("Users")
+                                .child(user.getUserID())
+                                .child("numberFollower")
+                                .setValue(user.getNumberFollower()+1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        binding.followBtn.setVisibility(View.GONE);
+                                        binding.followingBtn.setVisibility(View.VISIBLE);
+                                        binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user));
+                                        Toast.makeText(getApplicationContext(),"You followed "+user.getName(),Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
+    }
+    private void showUnfollowBottomSheet(User user) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_unfollow, null);
+        bottomSheetDialog.setContentView(view);
+        DialogUnfollowBinding binding=DialogUnfollowBinding.bind(view);
+        String coverPhoto = user.getCoverPhoto();
+
+        if ( coverPhoto == null ||  coverPhoto.isEmpty()) {
+            Picasso.get()
+                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
+                    .placeholder(R.drawable.avt)
+                    .into(binding.profileImage);
+        } else {
+            Picasso.get()
+                    .load(coverPhoto)
+                    .placeholder(R.drawable.avt)
+                    .into(binding.profileImage);
+        }
+        binding.titleText.setText("Unfollow "+user.getName()+"?");
+        binding.confirmBtn.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            handleUnfollow(user);
+        });
+        binding.cancelBtn.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        bottomSheetDialog.show();
+    }
+
+    private void handleUnfollow(User user){
+        FirebaseDatabase.getInstance().getReference().child("Users")
+                .child(user.getUserID())
+                .child("followers")
+                .child(currentUser.getUid())
+                .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        FirebaseDatabase.getInstance().getReference("Users")
+                                .child(user.getUserID())
+                                .child("numberFollower")
+                                .setValue(user.getNumberFollower()-1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        binding.followBtn.setVisibility(View.VISIBLE);
+                                        binding.followingBtn.setVisibility(View.GONE);
+                                        binding.followBtn.setOnClickListener(v -> handleFollow(user));
+                                        Toast.makeText(getApplicationContext(),"You unfollowed "+user.getName(),Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
+    }
+}

@@ -1,13 +1,6 @@
 package com.bugbug.blogapp.Fragment;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -16,21 +9,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.bugbug.blogapp.Adapter.UserAdapter;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
-import com.bugbug.blogapp.databinding.FragmentAddBinding;
 import com.bugbug.blogapp.databinding.FragmentSearchBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-
+import java.util.Collections;
 
 public class SearchFragment extends Fragment {
     private static final long DEBOUNCE_DELAY = 600;
@@ -38,29 +32,26 @@ public class SearchFragment extends Fragment {
     FragmentSearchBinding binding;
     BottomNavigationView bottomNav;
 
+    ArrayList<User> topUsersList = new ArrayList<>();
     UserAdapter userAdapter;
     ArrayList<User> list = new ArrayList<>();
     RecyclerView recyclerView;
 
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-
     FirebaseDatabase database;
 
     public SearchFragment() {
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        database=FirebaseDatabase.getInstance();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        database = FirebaseDatabase.getInstance();
         binding = FragmentSearchBinding.inflate(inflater, container, false);
 
         userAdapter = new UserAdapter(list, getContext());
@@ -70,39 +61,59 @@ public class SearchFragment extends Fragment {
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(userAdapter);
 
+        loadTopUsers();
+
+        binding.searchBar.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                binding.textView14.setVisibility(View.GONE);
+                binding.backArrow.setVisibility(View.VISIBLE);
+            } else {
+                binding.textView14.setVisibility(View.VISIBLE);
+                binding.backArrow.setVisibility(View.GONE);
+                binding.searchBar.setText("");
+                list.clear();
+                list.addAll(topUsersList);
+                userAdapter.notifyDataSetChanged();
+            }
+        });
+
+        binding.backArrow.setOnClickListener(v -> {
+            binding.searchBar.clearFocus();
+        });
+
         binding.searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String keyword=s.toString();
+                String keyword = s.toString();
 
                 if (searchRunnable != null) {
                     handler.removeCallbacks(searchRunnable);
                 }
 
-                searchRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (keyword.isEmpty()) {
-                            list.clear();
-                            userAdapter.notifyDataSetChanged();
-                        } else {
-                            handleSearch(keyword);
-                        }
+                searchRunnable = () -> {
+                    if (keyword.isEmpty()) {
+                        list.clear();
+                        list.addAll(topUsersList);
+                        userAdapter.notifyDataSetChanged();
+                    } else {
+                        handleSearch(keyword);
                     }
                 };
 
                 handler.postDelayed(searchRunnable, DEBOUNCE_DELAY);
             }
+
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
         return binding.getRoot();
     }
 
-    private void handleSearch(String keyword){
+    private void handleSearch(String keyword) {
         database.getReference().child("Users")
                 .orderByChild("name")
                 .startAt(keyword)
@@ -112,12 +123,13 @@ public class SearchFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         list.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            User user=dataSnapshot.getValue(User.class);
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            User user = dataSnapshot.getValue(User.class);
                             list.add(user);
                         }
                         userAdapter.notifyDataSetChanged();
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         list.clear();
@@ -132,17 +144,40 @@ public class SearchFragment extends Fragment {
         bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
         View rootView = binding.getRoot();
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            if (!isAdded()){
+            if (!isAdded()) {
                 bottomNav.setVisibility(View.VISIBLE);
                 return;
             }
             int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
 
-            if (heightDiff > getResources().getDisplayMetrics().density*200) {
+            if (heightDiff > getResources().getDisplayMetrics().density * 200) {
                 bottomNav.setVisibility(View.GONE);
             } else {
                 bottomNav.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    private void loadTopUsers() {
+        database.getReference().child("Users")
+                .orderByChild("numberFollower")
+                .limitToLast(10)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        topUsersList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            User user = dataSnapshot.getValue(User.class);
+                            topUsersList.add(user);
+                        }
+                        Collections.reverse(topUsersList);
+                        list.clear();
+                        list.addAll(topUsersList);
+                        userAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 }

@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
 import java.util.ArrayList;
 
 
@@ -32,6 +33,8 @@ public class HomeFragment extends Fragment {
     ArrayList<Post> postList;
     FirebaseDatabase database;
     FirebaseAuth auth;
+
+    ArrayList<DasboardModel> dasboardList;
 
     public HomeFragment() {
 
@@ -52,7 +55,7 @@ public class HomeFragment extends Fragment {
         storyRecyclerView = view.findViewById(R.id.storyRV);
         storyList = new ArrayList<>();
         storyList.add(new StoryModel(R.drawable.im1, R.drawable.ic_live, R.drawable.avt, "John Doe"));
-        storyList.add(new StoryModel(R.drawable.avatar_image, R.drawable.ic_live, R.drawable.avt, "John Doe"));
+        storyList.add(new StoryModel(R.drawable.avatar_default, R.drawable.ic_live, R.drawable.avt, "John Doe"));
         storyList.add(new StoryModel(R.drawable.avt, R.drawable.ic_live, R.drawable.avt, "John Doe"));
         StoryAdapter storyAdapter = new StoryAdapter(storyList, getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
