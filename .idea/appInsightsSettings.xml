@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.bugbug.blogapp" />
+                  <option name="mobileSdkAppId" value="1:1050856718255:android:8d205d28705308df3d795a" />
+                  <option name="projectId" value="blogapp-53377" />
+                  <option name="projectNumber" value="1050856718255" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

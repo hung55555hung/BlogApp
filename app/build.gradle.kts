@@ -46,6 +46,10 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -66,5 +70,7 @@ dependencies {
     implementation("com.cloudinary:cloudinary-android:3.0.2")
 
     implementation ("com.squareup.picasso:picasso:2.8")
+
+    implementation("com.github.marlonlom:timeago:4.1.0")
 
 }
