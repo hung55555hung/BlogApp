@@ -56,10 +56,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewHold
                             if (user.getCoverPhoto() != null && !user.getCoverPhoto().isEmpty()) {
                                 Picasso.get()
                                         .load(user.getCoverPhoto())
-                                        .placeholder(R.drawable.placeholder)
+                                        .placeholder(R.drawable.avatar_default)
                                         .into(holder.binding.profileImage);
                             } else {
-                                holder.binding.profileImage.setImageResource(R.drawable.placeholder);
+                                holder.binding.profileImage.setImageResource(R.drawable.avatar_default);
                             }
                         }
                     }

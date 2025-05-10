@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bugbug.blogapp.Activity.MainActivity;
 import com.bugbug.blogapp.Activity.UserProfileActivity;
 import com.bugbug.blogapp.Model.Follow;
+import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.DialogUnfollowBinding;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -59,10 +61,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         User user = list.get(position);
         String coverPhoto = user.getCoverPhoto();
         if (coverPhoto == null || coverPhoto.isEmpty()) {
-            Picasso.get()
-                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
-                    .placeholder(R.drawable.avt)
-                    .into(holder.binding.profileImage);
+            holder.binding.profileImage.setImageResource(R.drawable.avatar_default);
         } else {
             Picasso.get()
                     .load(coverPhoto)
@@ -95,7 +94,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context, UserProfileActivity.class);
-                intent.putExtra("user",user);
+                intent.putExtra("userId",user.getUserID());
                 context.startActivity(intent);
             }
         });
@@ -119,6 +118,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                 .setValue(user.getNumberFollower()+1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        Notification notification=new Notification();
+                                        notification.setSenderId(currentUser.getUid());
+                                        notification.setTimestamp(new Date().getTime());
+                                        notification.setReceiverId(user.getUserID());
+                                        notification.setActionType("Follow");
+
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("Notification")
+                                                .child(user.getUserID())
+                                                .push()
+                                                .setValue(notification);
                                         holder.binding.followBtn.setVisibility(View.GONE);
                                         holder.binding.followingBtn.setVisibility(View.VISIBLE);
                                         holder.binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user, holder));
@@ -169,6 +179,24 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                 .setValue(user.getNumberFollower()-1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        DatabaseReference notificationRef = FirebaseDatabase.getInstance()
+                                                .getReference()
+                                                .child("Notification")
+                                                .child(user.getUserID());
+                                        notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                            Notification notification = snapshot.getValue(Notification.class);
+                                                            if (notification != null && notification.getSenderId().equals(currentUser.getUid()) && notification.getActionType().equals("Follow")) {
+                                                                snapshot.getRef().removeValue();
+                                                            }
+                                                        }
+                                                    }
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    }
+                                                });
                                         holder.binding.followBtn.setVisibility(View.VISIBLE);
                                         holder.binding.followingBtn.setVisibility(View.GONE);
                                         holder.binding.followBtn.setOnClickListener(v -> handleFollow(user,holder));
