@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bugbug.blogapp.Activity.CommentActivity;
+import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
@@ -23,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
@@ -149,8 +151,39 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             if (isLiked) {
                 likeRef.removeValue();
+                DatabaseReference notificationRef = FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child("Notification")
+                        .child(post.getPostedBy());
+                notificationRef.orderByChild("postId")
+                        .equalTo(post.getPostId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                    Notification notification = snapshot.getValue(Notification.class);
+                                    if (notification != null && notification.getSenderId().equals(currentUserId) && notification.getActionType().equals("Like")) {
+                                        snapshot.getRef().removeValue();
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
             } else {
                 likeRef.setValue(true);
+                Notification notification=new Notification();
+                notification.setSenderId(currentUserId);
+                notification.setTimestamp(new Date().getTime());
+                notification.setPostId(post.getPostId());
+                notification.setReceiverId(post.getPostedBy());
+                notification.setActionType("Like");
+
+                FirebaseDatabase.getInstance().getReference()
+                        .child("Notification")
+                        .child(post.getPostedBy())
+                        .push()
+                        .setValue(notification);
             }
         }
 

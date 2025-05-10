@@ -31,11 +31,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AddFragment extends Fragment {
@@ -141,22 +144,33 @@ public class AddFragment extends Fragment {
                         @Override
                         public void onSuccess(String imageUrl) {
                             if (imageUrl != null) {
+                                String userId = currentUser.getUid();
+                                String postDescription = binding.postDescription.getText().toString();
+                                long postedAt = new Date().getTime();
+
+                                DatabaseReference postRef = database.getReference().child("Posts").push();
+                                String postId = postRef.getKey();
+
                                 Post post = new Post();
+                                post.setPostId(postId);
                                 post.setPostImage(imageUrl);
-                                post.setPostedBy(currentUser.getUid());
-                                post.setPostDescription(binding.postDescription.getText().toString());
-                                post.setPostedAt(new Date().getTime());
-                                database.getReference().child("Posts")
-                                        .push()
-                                        .setValue(post)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                if (isAdded()) {
-                                                    Toast.makeText(requireContext(), "Posting successfully", Toast.LENGTH_SHORT).show();
-                                                }
-                                                bottomNav.setSelectedItemId(R.id.nav_home);
+                                post.setPostedBy(userId);
+                                post.setPostDescription(postDescription);
+                                post.setPostedAt(postedAt);
+
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("/Posts/" + postId, post);
+                                updates.put("/UserPosts/" + userId + "/" + postId, true);
+
+                                database.getReference().updateChildren(updates)
+                                        .addOnSuccessListener(unused -> {
+                                            if (isAdded()) {
+                                                Toast.makeText(requireContext(), "Posting successfully", Toast.LENGTH_SHORT).show();
                                             }
+                                            bottomNav.setSelectedItemId(R.id.nav_home);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(requireContext(), "Post failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         });
                             }
                         }

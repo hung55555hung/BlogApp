@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bugbug.blogapp.Adapter.CommentAdapter;
 import com.bugbug.blogapp.Model.Comment;
+import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityCommentBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,16 +52,14 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void initialize() {
-        setSupportActionBar(binding.toolbar);
-        setTitle("Comments");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
 
         Intent intent = getIntent();
         postId = intent.getStringExtra("postId");
         postedBy = intent.getStringExtra("postedBy");
+
+        binding.btnReturn.setOnClickListener(v->{finish();});
     }
 
     private void loadPostDetails() {
@@ -77,11 +75,11 @@ public class CommentActivity extends AppCompatActivity {
                         Picasso.get()
                                 .load(post.getPostImage())
                                 .placeholder(R.drawable.placeholder)
-                                .into(binding.postImage);
+                                .into(binding.postImg);
 
-                        binding.description.setText(post.getPostDescription());
-                        binding.like.setText(String.valueOf(post.getPostLikes()));
-                        binding.comment.setText(String.valueOf(post.getCommentCount()));
+                        binding.postDescription.setText(post.getPostDescription());
+                        binding.like.setText(post.getPostLikes()+" Likes");
+                        binding.comment.setText(post.getCommentCount()+ " Comments");
                     }
 
                     @Override
@@ -97,6 +95,7 @@ public class CommentActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String name = snapshot.child("name").getValue(String.class);
+                        String profession=snapshot.child("profession").getValue(String.class);
                         String coverPhoto = snapshot.child("coverPhoto").getValue(String.class);
 
                         if (coverPhoto != null && !coverPhoto.isEmpty()) {
@@ -108,7 +107,8 @@ public class CommentActivity extends AppCompatActivity {
                             binding.profileImage.setImageResource(R.drawable.avatar_default);
                         }
 
-                        binding.name.setText(name);
+                        binding.userName.setText(name);
+                        binding.professionTv.setText(profession);
                     }
 
                     @Override
@@ -133,6 +133,7 @@ public class CommentActivity extends AppCompatActivity {
                     .push()
                     .setValue(comment)
                     .addOnSuccessListener(unused -> updateCommentCount());
+
         });
     }
 
@@ -155,6 +156,17 @@ public class CommentActivity extends AppCompatActivity {
                                     Toast.makeText(CommentActivity.this, "Commented", Toast.LENGTH_SHORT).show();
                                     binding.commentEt.setText("");
                                 });
+                        Notification notification=new Notification();
+                        notification.setSenderId(auth.getCurrentUser().getUid());
+                        notification.setTimestamp(new Date().getTime());
+                        notification.setPostId(postId);
+                        notification.setReceiverId(postedBy);
+                        notification.setActionType("Comment");
+
+                        database.getReference().child("Notification")
+                                .child(postedBy)
+                                .push()
+                                .setValue(notification);
                     }
 
                     @Override

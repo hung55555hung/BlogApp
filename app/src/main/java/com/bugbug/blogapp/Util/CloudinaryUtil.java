@@ -34,7 +34,7 @@ public class CloudinaryUtil {
                     Cloudinary cloudinary = CloudinaryConfig.getInstance();
                     Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.asMap(
                             "resource_type", "image",
-                            "folder", "post" // Upload to the "post" folder in Cloudinary
+                            "folder", "post"
                     ));
                     String imageUrl = uploadResult.get("secure_url").toString();
                     new Handler(Looper.getMainLooper()).post(() -> listener.onSuccess(imageUrl));

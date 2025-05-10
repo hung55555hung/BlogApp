@@ -7,8 +7,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.bugbug.blogapp.Adapter.PostAdapter;
 import com.bugbug.blogapp.Model.Follow;
+import com.bugbug.blogapp.Model.Notification;
+import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityUserProfileBinding;
@@ -19,10 +23,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class UserProfileActivity extends AppCompatActivity {
@@ -31,6 +37,8 @@ public class UserProfileActivity extends AppCompatActivity {
     FirebaseDatabase database;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    User user;
+    ArrayList<Post> postList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +50,42 @@ public class UserProfileActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         currentUser=mAuth.getCurrentUser();
 
-        User user=(User) getIntent().getSerializableExtra("user");
+        //Load user info
+        String userId=getIntent().getStringExtra("userId");
         database.getReference().child("Users")
-                .child(user.getUserID()).child("followers")
-                .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        .child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
+                        user=snapshot.getValue(User.class);
+                        binding.tvName.setText(user.getName());
+                        binding.tvFullName.setText(user.getName());
+                        binding.tvProfession.setText(user.getProfession());
+                        binding.tvBio.setText(user.getBio());
+                        binding.tvPostBy.setText(user.getName()+"' s Posts");
+
+                        String coverPhoto = user.getCoverPhoto();
+                        if (coverPhoto == null || coverPhoto.isEmpty()) {
+                            binding.avatarImg.setImageResource(R.drawable.avatar_default);
+                        } else {
+                            Picasso.get()
+                                    .load(coverPhoto)
+                                    .placeholder(R.drawable.avt)
+                                    .into(binding.avatarImg);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+
+        //Load follower
+        DatabaseReference followerRef=database.getReference().child("Users")
+                                .child(userId).child("followers");
+        followerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        long followerCount=snapshot.getChildrenCount();
+                        binding.tvFollower.setText(followerCount+"");
+                        if(snapshot.hasChild(currentUser.getUid())){
                             binding.followBtn.setVisibility(View.GONE);
                             binding.followingBtn.setVisibility(View.VISIBLE);
                             binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user));
@@ -58,28 +95,45 @@ public class UserProfileActivity extends AppCompatActivity {
                             binding.followBtn.setOnClickListener(v -> handleFollow(user));
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
-        String coverPhoto = user.getCoverPhoto();
-        if (coverPhoto == null || coverPhoto.isEmpty()) {
-            Picasso.get()
-                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
-                    .placeholder(R.drawable.avt)
-                    .into(binding.avatarImg);
-        } else {
-            Picasso.get()
-                    .load(coverPhoto)
-                    .placeholder(R.drawable.avt)
-                    .into(binding.avatarImg);
-        }
-        binding.tvName.setText(user.getName());
-        binding.tvFullName.setText(user.getName());
-        binding.tvProfession.setText(user.getProfession());
-        binding.tvBio.setText(user.getBio());
-        binding.tvFollower.setText(user.getNumberFollower()+"");
-        binding.tvPostBy.setText("Posts by "+user.getName());
+
+        //Load friend
+        //Load photo
+
+        //Load post by user
+        postList = new ArrayList<>();
+        PostAdapter postAdapter = new PostAdapter(postList, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        binding.postRv.setLayoutManager(layoutManager);
+        binding.postRv.setAdapter(postAdapter);
+
+        DatabaseReference userPostsRef = database.getReference().child("UserPosts").child(userId);
+        userPostsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String postId = dataSnapshot.getKey();
+                    database.getReference().child("Posts").child(postId)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    Post post = snapshot.getValue(Post.class);
+                                    postList.add(post);
+                                    postAdapter.notifyDataSetChanged();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {}
+                            });
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
         binding.btnReturn.setOnClickListener(v->{finish();});
     }
 
@@ -101,6 +155,17 @@ public class UserProfileActivity extends AppCompatActivity {
                                 .setValue(user.getNumberFollower()+1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        Notification notification=new Notification();
+                                        notification.setSenderId(currentUser.getUid());
+                                        notification.setTimestamp(new Date().getTime());
+                                        notification.setReceiverId(user.getUserID());
+                                        notification.setActionType("Follow");
+
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("Notification")
+                                                .child(user.getUserID())
+                                                .push()
+                                                .setValue(notification);
                                         binding.followBtn.setVisibility(View.GONE);
                                         binding.followingBtn.setVisibility(View.VISIBLE);
                                         binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user));
@@ -136,7 +201,6 @@ public class UserProfileActivity extends AppCompatActivity {
         binding.cancelBtn.setOnClickListener(v -> bottomSheetDialog.dismiss());
         bottomSheetDialog.show();
     }
-
     private void handleUnfollow(User user){
         FirebaseDatabase.getInstance().getReference().child("Users")
                 .child(user.getUserID())
@@ -151,6 +215,24 @@ public class UserProfileActivity extends AppCompatActivity {
                                 .setValue(user.getNumberFollower()-1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        DatabaseReference notificationRef = FirebaseDatabase.getInstance()
+                                                .getReference()
+                                                .child("Notification")
+                                                .child(user.getUserID());
+                                        notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                    Notification notification = snapshot.getValue(Notification.class);
+                                                    if (notification != null && notification.getSenderId().equals(currentUser.getUid()) && notification.getActionType().equals("Follow")) {
+                                                        snapshot.getRef().removeValue();
+                                                    }
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            }
+                                        });
                                         binding.followBtn.setVisibility(View.VISIBLE);
                                         binding.followingBtn.setVisibility(View.GONE);
                                         binding.followBtn.setOnClickListener(v -> handleFollow(user));
