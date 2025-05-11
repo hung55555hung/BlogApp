@@ -125,7 +125,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     int realTimeLikeCount = (int) snapshot.getChildrenCount();
-                    binding.like.setText((realTimeLikeCount + post.getPostLikes()) + "");
+                    binding.like.setText(realTimeLikeCount + "");
 
                     boolean isLiked = snapshot.hasChild(currentUserId);
                     binding.like.setCompoundDrawablesWithIntrinsicBounds(
@@ -142,10 +142,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         private void toggleLike(Post post, boolean isLiked) {
-            DatabaseReference likeRef = FirebaseDatabase.getInstance()
+            DatabaseReference postRef = FirebaseDatabase.getInstance()
                     .getReference()
                     .child("Posts")
-                    .child(post.getPostId())
+                    .child(post.getPostId());
+
+            DatabaseReference likeRef = postRef
                     .child("likes")
                     .child(currentUserId);
 

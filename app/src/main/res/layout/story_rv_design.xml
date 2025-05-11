@@ -5,6 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/story"
         android:layout_width="130dp"
@@ -25,7 +26,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:src="@drawable/avt"
-        app:civ_border_color="#FFFFFF"
+        app:civ_border_color="#F4450B"
         app:civ_border_overlay="false"
         app:civ_border_width="1dp"
         app:layout_constraintStart_toStartOf="@+id/story"

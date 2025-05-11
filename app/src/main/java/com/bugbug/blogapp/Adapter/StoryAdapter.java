@@ -6,47 +6,136 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bugbug.blogapp.Model.StoryModel;
+import com.bugbug.blogapp.Model.Story;
+import com.bugbug.blogapp.Model.User;
+import com.bugbug.blogapp.Model.UserStories;
 import com.bugbug.blogapp.R;
+import com.bugbug.blogapp.databinding.StoryRvDesignBinding;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> {
+import omari.hamza.storyview.StoryView;
+import omari.hamza.storyview.callback.StoryClickListeners;
+import omari.hamza.storyview.model.MyStory;
 
-    ArrayList<StoryModel> storyList;
+public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final int TYPE_CREATE_STORY = 0;
+    private static final int TYPE_STORY = 1;
+
+    ArrayList<Story> storyList;
     Context context;
 
-    public StoryAdapter(ArrayList<StoryModel> storyList, Context context) {
+    public interface OnCreateStoryClickListener {
+        void onCreateStoryClicked();
+    }
+
+    OnCreateStoryClickListener listener;
+
+    public StoryAdapter(ArrayList<Story> storyList, Context context,  OnCreateStoryClickListener listener) {
         this.storyList = storyList;
         this.context = context;
+        this.listener = listener;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return storyList.get(position).isCreateStory() ? TYPE_CREATE_STORY : TYPE_STORY;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.story_rv_design, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TYPE_CREATE_STORY) {
+            View view = LayoutInflater.from(context).inflate(R.layout.story_create_design, parent, false);
+            return new CreateStoryViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(context).inflate(R.layout.story_rv_design, parent, false);
+            return new StoryViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        StoryModel storyModel = storyList.get(position);
-        holder.storyImage.setImageResource(storyModel.getStory());
-        holder.storyTypeImage.setImageResource(storyModel.getStoryType());
-        holder.profileImage.setImageResource(storyModel.getProfile());
-        holder.name.setText(storyModel.getName());
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        Story story = storyList.get(position);
+        if (holder instanceof CreateStoryViewHolder) {
+            CreateStoryViewHolder createHolder = (CreateStoryViewHolder) holder;
+            createHolder.storyImage.setImageResource(story.getStory());
+            createHolder.addIcon.setVisibility(View.VISIBLE);
+            createHolder.textView.setText("Create a Story");
+        } else {
+            StoryViewHolder storyHolder = (StoryViewHolder) holder;
+            UserStories latestStory = story.getStories().get(story.getStories().size() - 1);
+            Picasso.get()
+                    .load(latestStory.getImage())
+                    .placeholder(R.drawable.placeholder)
+                    .into(storyHolder.binding.story);
+            FirebaseDatabase.getInstance().getReference()
+                    .child("Users")
+                    .child(story.getStoryBy()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            User user = snapshot.getValue(User.class);
+                            if(user.getCoverPhoto() != null && !user.getCoverPhoto().isEmpty()) {
+                                Picasso.get()
+                                        .load(user.getCoverPhoto())
+                                        .placeholder(R.drawable.placeholder)
+                                        .into(storyHolder.binding.profileImage);
+                            } else {
+                                Picasso.get()
+                                        .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
+                                        .placeholder(R.drawable.placeholder)
+                                        .into(storyHolder.binding.profileImage);
+                            }
+                            storyHolder.binding.name.setText(user.getName());
+                            storyHolder.binding.story.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ArrayList<MyStory> myStories = new ArrayList<>();
 
-        // Set click listener for the story image
-        holder.storyImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle story image click
-            }
-        });
+                                    for(UserStories stories: story.getStories()){
+                                        myStories.add(new MyStory(
+                                                stories.getImage()
+                                        ));
+                                    }
+                                    new StoryView.Builder(((AppCompatActivity) context).getSupportFragmentManager())
+                                            .setStoriesList(myStories)
+                                            .setStoryDuration(5000)
+                                            .setTitleText(user.getName())
+                                            .setSubtitleText("")
+                                            .setTitleLogoUrl(user.getCoverPhoto())
+                                            .setStoryClickListeners(new StoryClickListeners() {
+                                                @Override
+                                                public void onDescriptionClickListener(int position) {
+                                                    //your action
+                                                }
+
+                                                @Override
+                                                public void onTitleIconClickListener(int position) {
+                                                    //your action
+                                                }
+                                            }) // Optional Listeners
+                                            .build() // Must be called before calling show method
+                                            .show();
+                                }
+                            });
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+        }
     }
 
     @Override
@@ -54,17 +143,32 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         return storyList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class CreateStoryViewHolder extends RecyclerView.ViewHolder {
+        ShapeableImageView storyImage;
+        ImageView addIcon;
+        TextView textView;
 
-        ImageView storyImage, profileImage, storyTypeImage;
-        TextView name;
-        public ViewHolder(@NonNull View itemView) {
+        public CreateStoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            storyImage = itemView.findViewById(R.id.story);
-            profileImage = itemView.findViewById(R.id.profile_image);
-            storyTypeImage = itemView.findViewById(R.id.storyType);
-            name = itemView.findViewById(R.id.name);
+            storyImage = itemView.findViewById(R.id.addStory);
+            addIcon = itemView.findViewById(R.id.btn_create_story);
+            textView = itemView.findViewById(R.id.textView2);
+            storyImage = itemView.findViewById(R.id.addStory);
+            storyImage.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCreateStoryClicked();
+                }
+            });
         }
     }
 
+    public class StoryViewHolder extends RecyclerView.ViewHolder {
+        StoryRvDesignBinding binding;
+
+        public StoryViewHolder(@NonNull View itemView) {
+            super(itemView);
+            binding = StoryRvDesignBinding.bind(itemView);
+
+        }
+    }
 }

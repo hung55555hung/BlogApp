@@ -69,5 +69,8 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.8")
 
     implementation("com.github.marlonlom:timeago:4.1.0")
+    implementation ("com.github.3llomi:CircularStatusView:V1.0.3")
+
+    implementation ("com.github.OMARIHAMZA:StoryView:1.0.2-alpha")
 
 }
