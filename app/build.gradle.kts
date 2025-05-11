@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -72,5 +73,8 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.8")
 
     implementation("com.github.marlonlom:timeago:4.1.0")
+    implementation ("com.github.3llomi:CircularStatusView:V1.0.3")
+
+    implementation ("com.github.OMARIHAMZA:StoryView:1.0.2-alpha")
 
 }
