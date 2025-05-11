@@ -14,7 +14,6 @@ firebaseDatabase = "21.0.0"
 firebaseStorage = "21.0.1"
 firebaseAuth = "23.2.0"
 
-
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -28,7 +27,6 @@ annotation = { group = "androidx.annotation", name = "annotation", version.ref =
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.7.3" }
