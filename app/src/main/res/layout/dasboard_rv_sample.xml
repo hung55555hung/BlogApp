@@ -67,7 +67,7 @@
             android:text="This is a beautiful day in Da Nang!"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/postImg"
+            app:layout_constraintBottom_toTopOf="@+id/imagesRecyclerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profile_image" />
@@ -79,24 +79,24 @@
             android:layout_height="30dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="@+id/postImg"
-            app:layout_constraintTop_toTopOf="@+id/postImg"
+            app:layout_constraintEnd_toEndOf="@+id/imagesRecyclerView"
+            app:layout_constraintTop_toTopOf="@+id/imagesRecyclerView"
             app:srcCompat="@drawable/ic_bookmark" />
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/postImg"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_150mdp"
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/imagesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/im1"
+            android:nestedScrollingEnabled="false"
+            app:layout_constrainedHeight="true"
+            android:layout_marginHorizontal="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.997"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postDescription"
-            app:shapeAppearanceOverlay="@style/AppTheme"
-            app:strokeColor="@android:color/black"
-            tools:ignore="MissingConstraints" />
+            app:layout_constraintTop_toBottomOf="@+id/postDescription" />
 
         <TextView
             android:id="@+id/like"
@@ -109,7 +109,7 @@
             android:text="354 Likes"
             android:textSize="@dimen/_13font_mdp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postImg" />
+            app:layout_constraintTop_toBottomOf="@+id/imagesRecyclerView" />
 
         <TextView
             android:id="@+id/comment"

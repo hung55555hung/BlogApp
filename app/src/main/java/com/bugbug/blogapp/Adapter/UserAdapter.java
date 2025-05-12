@@ -1,21 +1,16 @@
 package com.bugbug.blogapp.Adapter;
 
-import static androidx.core.content.ContextCompat.startActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bugbug.blogapp.Activity.MainActivity;
 import com.bugbug.blogapp.Activity.UserProfileActivity;
 import com.bugbug.blogapp.Model.Follow;
 import com.bugbug.blogapp.Model.Notification;
@@ -123,12 +118,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                         notification.setTimestamp(new Date().getTime());
                                         notification.setReceiverId(user.getUserID());
                                         notification.setActionType("Follow");
-
                                         FirebaseDatabase.getInstance().getReference()
                                                 .child("Notification")
                                                 .child(user.getUserID())
                                                 .push()
                                                 .setValue(notification);
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("Followings")
+                                                .child(currentUser.getUid())
+                                                .child(user.getUserID())
+                                                .setValue(true);
+
                                         holder.binding.followBtn.setVisibility(View.GONE);
                                         holder.binding.followingBtn.setVisibility(View.VISIBLE);
                                         holder.binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user, holder));
@@ -146,10 +146,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         String coverPhoto = user.getCoverPhoto();
 
         if ( coverPhoto == null ||  coverPhoto.isEmpty()) {
-            Picasso.get()
-                    .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
-                    .placeholder(R.drawable.avt)
-                    .into(binding.profileImage);
+            binding.profileImage.setImageResource(R.drawable.avatar_default);
         } else {
             Picasso.get()
                     .load(coverPhoto)
@@ -197,6 +194,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                                     public void onCancelled(@NonNull DatabaseError databaseError) {
                                                     }
                                                 });
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("Followings")
+                                                .child(currentUser.getUid())
+                                                .child(user.getUserID())
+                                                .removeValue();
                                         holder.binding.followBtn.setVisibility(View.VISIBLE);
                                         holder.binding.followingBtn.setVisibility(View.GONE);
                                         holder.binding.followBtn.setOnClickListener(v -> handleFollow(user,holder));

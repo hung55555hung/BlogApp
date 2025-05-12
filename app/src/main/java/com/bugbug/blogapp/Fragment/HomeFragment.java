@@ -1,13 +1,10 @@
 package com.bugbug.blogapp.Fragment;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -15,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,16 +19,11 @@ import android.widget.Toast;
 
 import com.bugbug.blogapp.Adapter.PostAdapter;
 import com.bugbug.blogapp.Adapter.StoryAdapter;
-import com.bugbug.blogapp.Config.CloudinaryConfig;
-import com.bugbug.blogapp.Model.DasboardModel;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.Story;
 import com.bugbug.blogapp.Model.UserStories;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.Util.CloudinaryUtil;
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -40,14 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 
 
 public class HomeFragment extends Fragment {
@@ -61,9 +47,6 @@ public class HomeFragment extends Fragment {
     ShapeableImageView addStory;
     ActivityResultLauncher<String> galleryLauncher;
     ProgressDialog dialog;
-
-
-    ArrayList<DasboardModel> dasboardList;
 
     public HomeFragment() {
 
@@ -136,7 +119,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
@@ -149,7 +131,7 @@ public class HomeFragment extends Fragment {
         dasboardRecyclerView.setNestedScrollingEnabled(false);
         dasboardRecyclerView.setAdapter(postAdapter);
 
-        database.getReference().child("Posts").addValueEventListener(new ValueEventListener(){
+        database.getReference().child("Posts").addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 postList.clear();
@@ -162,9 +144,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
 
         });
         return view;
@@ -172,7 +152,7 @@ public class HomeFragment extends Fragment {
 
     private void uploadImageToFirebase(Uri uri) {
         dialog.show();
-        CloudinaryUtil.uploadImage(getContext(), uri, new CloudinaryUtil.UploadResultListener() {
+        CloudinaryUtil.uploadImage(getContext(), uri, new CloudinaryUtil.UploadImageResultListener() {
             @Override
             public void onSuccess(String imageUrl) {
                 Story story = new Story();
