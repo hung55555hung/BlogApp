@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.bugbug.blogapp.Activity.LoginActivity;
@@ -97,42 +98,48 @@ public class ProfileFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
         ImageView imageViewSetting = view.findViewById(R.id.imageViewSetting);
-        imageViewSetting.setOnClickListener(v -> showSettingDialog());
+        imageViewSetting.setOnClickListener(v -> showSettingDialog(v));
 
         return view;
     }
-    private void showSettingDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Settings");
-        String[] options = {"Edit Profile", "Change Password", "Logout"};
-        builder.setItems(options, (dialog, which) -> {
-            Fragment fragment = null;
-            switch (which) {
-                case 0:
-                    fragment = new EditProfileFragment();
-                    break;
-                case 1:
-                    fragment = new ChangePasswordFragment();
-                    break;
-                case 2:
-                    FirebaseAuth.getInstance().signOut();
-                    requireActivity().runOnUiThread(() -> {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    });
-                    break;
-            }
-            if (fragment != null) {
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, fragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+    private void showSettingDialog(View anchorView) {
+        View popupView = LayoutInflater.from(getContext()).inflate(R.layout.popup_settings, null);
+
+        PopupWindow popupWindow = new PopupWindow(popupView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                true);
+
+        // Click handlers
+        popupView.findViewById(R.id.editProfile).setOnClickListener(v -> {
+            popupWindow.dismiss();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new EditProfileFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
 
-        builder.show();
+        popupView.findViewById(R.id.changePassword).setOnClickListener(v -> {
+            popupWindow.dismiss();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new ChangePasswordFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        popupView.findViewById(R.id.logout).setOnClickListener(v -> {
+            popupWindow.dismiss();
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
+
+
+        popupWindow.setElevation(10);
+        popupWindow.showAsDropDown(anchorView, -476, -50); // chỉnh vị trí menu
     }
+
 
 
 }
