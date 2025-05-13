@@ -136,6 +136,7 @@
                 android:text="54 Comments"
                 android:textSize="@dimen/_13font_mdp"
                 android:layout_marginStart="16dp"
+                app:layout_constraintVertical_bias="1.0"
                 app:layout_constraintBottom_toBottomOf="@+id/like"
                 app:layout_constraintEnd_toStartOf="@+id/share"
                 app:layout_constraintStart_toEndOf="@+id/like"
@@ -151,6 +152,7 @@
                 android:text="54 Shares"
                 android:textSize="@dimen/_13font_mdp"
                 android:layout_marginStart="16dp"
+                app:layout_constraintVertical_bias="1.0"
                 app:layout_constraintBottom_toBottomOf="@+id/comment"
                 app:layout_constraintStart_toEndOf="@+id/comment"
                 app:layout_constraintTop_toTopOf="@+id/comment" />

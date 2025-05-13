@@ -98,6 +98,49 @@ public class CloudinaryUtil {
         return tempFile;
     }
 
+    public static void deleteImage(String imageUrl, DeleteImageResultListener listener) {
+        executorService.execute(() -> {
+            try {
+                String publicId = extractPublicId(imageUrl);
+                Cloudinary cloudinary = CloudinaryConfig.getInstance();
+                Map deleteResult = cloudinary.uploader().destroy(publicId, ObjectUtils.asMap(
+                        "resource_type", "image"
+                ));
+                String result = deleteResult.get("result").toString();
+                if ("ok".equals(result)) {
+                    new Handler(Looper.getMainLooper()).post(() -> listener.onSuccess());
+                } else {
+                    throw new Exception("Deletion failed: " + result);
+                }
+            } catch (Exception e) {
+                new Handler(Looper.getMainLooper()).post(() -> listener.onFailure(e));
+            }
+        });
+    }
+
+    private static String extractPublicId(String imageUrl) {
+        String[] parts = imageUrl.split("/");
+        StringBuilder publicId = new StringBuilder();
+        boolean foundUpload = false;
+        for (String part : parts) {
+            if ("upload".equals(part)) {
+                foundUpload = true;
+                continue;
+            }
+            if (foundUpload && !part.startsWith("v")) {
+                publicId.append(part);
+                if (!part.contains(".")) {
+                    publicId.append("/");
+                }
+            }
+        }
+        String result = publicId.toString();
+        if (result.contains(".")) {
+            result = result.substring(0, result.lastIndexOf("."));
+        }
+        return result;
+    }
+
     private static void cleanupTempFile(File tempFile) {
         if (tempFile != null && tempFile.exists()) {
             boolean deleted = tempFile.delete();
@@ -123,5 +166,10 @@ public class CloudinaryUtil {
     public interface UploadPostImagesListener {
         void onSuccess(List<String> imageUrls);
         void onFailure(Exception e, int failedIndex);
+    }
+
+    public interface DeleteImageResultListener {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 }

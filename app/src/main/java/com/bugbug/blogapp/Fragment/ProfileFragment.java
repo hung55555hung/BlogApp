@@ -8,16 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bugbug.blogapp.Activity.ChangePasswordActivity;
-import com.bugbug.blogapp.Activity.EditProfileActivity;
+import com.bugbug.blogapp.Activity.LoginActivity;
 import com.bugbug.blogapp.Adapter.FollowAdapter;
 import com.bugbug.blogapp.Model.Follow;
 import com.bugbug.blogapp.R;
@@ -33,7 +30,6 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 public class ProfileFragment extends Fragment {
     String imageUrl;
     RecyclerView recyclerView;
@@ -44,10 +40,7 @@ public class ProfileFragment extends Fragment {
     FirebaseAuth auth;
     DatabaseReference userRef;
 
-
-    public ProfileFragment() {
-
-    }
+    public ProfileFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,7 +82,7 @@ public class ProfileFragment extends Fragment {
                     if (imageUrl != null && !imageUrl.isEmpty()) {
                         Picasso.get().load(imageUrl).placeholder(R.drawable.avt).into(profileImage);
                     } else {
-                        profileImage.setImageResource(R.drawable.avt); // Set default image
+                        profileImage.setImageResource(R.drawable.avt);
                     }
                 }
             }
@@ -99,11 +92,6 @@ public class ProfileFragment extends Fragment {
 
             }
         });
-//        list.add(new Follow(R.drawable.avatar_image));
-//        list.add(new Follow(R.drawable.avatar_image));
-//        list.add(new Follow(R.drawable.avatar_image));
-//        list.add(new Follow(R.drawable.avatar_image));
-//        list.add(new Follow(R.drawable.avatar_image));
         FollowAdapter adapter=new FollowAdapter(list,getContext());
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -116,16 +104,36 @@ public class ProfileFragment extends Fragment {
     private void showSettingDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Settings");
-        String[] options = {"Edit Profile", "Change Password"};
+        String[] options = {"Edit Profile", "Change Password", "Logout"};
         builder.setItems(options, (dialog, which) -> {
-            if (which == 0) {
-                startActivity(new Intent(getContext(), EditProfileActivity.class));
-            } else if (which == 1) {
-                startActivity(new Intent(getContext(), ChangePasswordActivity.class));
+            Fragment fragment = null;
+            switch (which) {
+                case 0:
+                    fragment = new EditProfileFragment();
+                    break;
+                case 1:
+                    fragment = new ChangePasswordFragment();
+                    break;
+                case 2:
+                    FirebaseAuth.getInstance().signOut();
+                    requireActivity().runOnUiThread(() -> {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    });
+                    break;
+            }
+            if (fragment != null) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
+
         builder.show();
     }
+
 
 }
 
