@@ -1,22 +1,23 @@
 package com.bugbug.blogapp.Model;
 
+import java.util.ArrayList;
+
 public class Post {
     private String postId;
-    private String postImage;
+    private ArrayList<String> postImages;
     private String postedBy;
     private String postDescription;
     private long postedAt;
-    private int postLikes;
-    private int commentCount;
 
-    public Post(String postId, String postImage, String postedBy, String postDescription, long postedAt) {
+    public Post(){}
+
+    public Post(String postId, ArrayList<String> postImages, String postedBy, String postDescription, long postedAt) {
         this.postId = postId;
-        this.postImage = postImage;
+        this.postImages = postImages;
         this.postedBy = postedBy;
         this.postDescription = postDescription;
         this.postedAt = postedAt;
     }
-    public Post(){}
 
     public String getPostId() {
         return postId;
@@ -26,12 +27,12 @@ public class Post {
         this.postId = postId;
     }
 
-    public String getPostImage() {
-        return postImage;
+    public ArrayList<String> getPostImages() {
+        return postImages;
     }
 
-    public void setPostImage(String postImage) {
-        this.postImage = postImage;
+    public void setPostImages(ArrayList<String> postImages) {
+        this.postImages = postImages;
     }
 
     public String getPostedBy() {
@@ -56,21 +57,5 @@ public class Post {
 
     public void setPostedAt(long postedAt) {
         this.postedAt = postedAt;
-    }
-
-    public int getPostLikes() {
-        return postLikes;
-    }
-
-    public void setPostLikes(int postLikes) {
-        this.postLikes = postLikes;
-    }
-
-    public int getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
     }
 }

@@ -49,7 +49,10 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         String id=task.getResult().getUser().getUid();
-                        User user=new User(id,name,"", email, password,"","");
+                        User user=new User();
+                        user.setUserID(id);
+                        user.setName(name);
+                        user.setEmail(email);
                         database.getReference().child("Users")
                                         .child(id).setValue(user);
                         Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();

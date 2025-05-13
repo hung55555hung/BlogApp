@@ -2,11 +2,13 @@ package com.bugbug.blogapp.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bugbug.blogapp.Activity.CommentActivity;
@@ -83,10 +85,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         private void loadPostImage(Post post) {
-            Picasso.get()
-                    .load(post.getPostImage())
-                    .placeholder(R.drawable.placeholder)
-                    .into(binding.postImg);
+            PostImageAdapter adapter=new PostImageAdapter(context,post.getPostImages());
+            binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            binding.imagesRecyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
 
         private void bindUserInfo(String userId) {
@@ -194,19 +196,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     .getReference()
                     .child("Posts")
                     .child(postId)
-                    .child("commentCount");
+                    .child("comments");
 
             commentCountRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    Long commentCount = snapshot.getValue(Long.class);
-                    if (commentCount != null) {
-                        binding.comment.setText(commentCount + " Comments");
-                    } else {
-                        binding.comment.setText("0 Comments");
-                    }
+                    long commentCount = snapshot.getChildrenCount();
+                    binding.comment.setText(commentCount + " Comments");
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
 
