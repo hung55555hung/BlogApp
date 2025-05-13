@@ -15,6 +15,9 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.FullScreenImageActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.CommentActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
