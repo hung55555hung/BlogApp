@@ -1,6 +1,7 @@
 package com.bugbug.blogapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,11 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bugbug.blogapp.Activity.FullScreenImageActivity;
 import com.bugbug.blogapp.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostImageAdapter extends RecyclerView.Adapter<PostImageAdapter.ViewHolder> {
@@ -61,7 +64,12 @@ public class PostImageAdapter extends RecyclerView.Adapter<PostImageAdapter.View
             holder.imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         }
         holder.imageView.setLayoutParams(imageParams);
-
+        holder.imageView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, FullScreenImageActivity.class);
+            intent.putStringArrayListExtra("imageUrls", new ArrayList<>(imageUrls));
+            intent.putExtra("position", position);
+            context.startActivity(intent);
+        });
         Picasso.get()
                 .load(imageUrl)
                 .placeholder(R.drawable.placeholder)
