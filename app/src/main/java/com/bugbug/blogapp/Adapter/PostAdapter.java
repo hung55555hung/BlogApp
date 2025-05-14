@@ -3,9 +3,11 @@ package com.bugbug.blogapp.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -79,12 +81,37 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     context.startActivity(intent);
                 }
             });
-            bindUserInfo(post.getPostedBy());
+
+            if(post.isShared()){
+                bindUserInfo(post.getSharedBy());
+                binding.shareFrom.setVisibility(View.VISIBLE);
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPostedBy());
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            binding.shareFrom.setText("Share from " + user.getName());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+
+            }else {
+                bindUserInfo(post.getPostedBy());
+            }
             bindLikeState(post);
             bindCommentCount(post.getPostId());
+            bindShareState(post);
         }
 
         private void loadPostImage(Post post) {
+            Log.d("TAG", post.getPostId());
+            if (post.getPostImages() == null || post.getPostImages().isEmpty()) {
+                return;
+            }
             PostImageAdapter adapter=new PostImageAdapter(context,post.getPostImages());
             binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             binding.imagesRecyclerView.setAdapter(adapter);
@@ -209,6 +236,54 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                 }
             });
+        }
+
+        private void bindShareState(Post post) {
+            DatabaseReference sharesRef = FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("Posts")
+                    .child(post.getPostId())
+                    .child("shares");
+
+            sharesRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    long shareCount = snapshot.getChildrenCount();
+                    binding.share.setText(shareCount +" ");
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("PostAdapter", "Error fetching share count: " + error.getMessage());
+                }
+            });
+
+            binding.share.setOnClickListener(view -> {
+                sharePost(post);
+            });
+        }
+
+        private void sharePost(Post post) {
+            DatabaseReference userSharesRef = FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("UserShares")
+                    .child(currentUserId)
+                    .child(post.getPostId());
+
+            DatabaseReference postSharesRef = FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("Posts")
+                    .child(post.getPostId())
+                    .child("shares")
+                    .child(currentUserId);
+
+            userSharesRef.setValue(true)
+                    .addOnSuccessListener(aVoid -> {
+                        postSharesRef.setValue(true);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "Failed to share post: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.bugbug.blogapp.Model;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Post {
     private String postId;
@@ -8,6 +9,8 @@ public class Post {
     private String postedBy;
     private String postDescription;
     private long postedAt;
+    private boolean isShared;
+    private String sharedBy;
 
     public Post(){}
 
@@ -57,5 +60,32 @@ public class Post {
 
     public void setPostedAt(long postedAt) {
         this.postedAt = postedAt;
+    }
+    public boolean isShared() {
+        return isShared;
+    }
+
+    public void setShared(boolean shared) {
+        isShared = shared;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Post post = (Post) o;
+        return postId.equals(post.postId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(postId);
+    }
+
+    public String getSharedBy() {
+        return sharedBy;
+    }
+
+    public void setSharedBy(String sharedBy) {
+        this.sharedBy = sharedBy;
     }
 }
