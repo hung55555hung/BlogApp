@@ -1,12 +1,21 @@
 package com.bugbug.blogapp.Model;
 
 public class Comment {
+    private String commentId;
     private String commentBody;
     private long commentAt;
     private String commentedBy;
-    private String comentByName;
+    private String commentByName;
 
     public Comment() {
+    }
+
+    public String getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 
     public String getCommentBody() {
@@ -33,11 +42,11 @@ public class Comment {
         this.commentedBy = commentedBy;
     }
 
-    public String getComentByName() {
-        return comentByName;
+    public String getCommentByName() {
+        return commentByName;
     }
 
-    public void setComentByName(String comentByName) {
-        this.comentByName = comentByName;
+    public void setCommentByName(String commentByName) {
+        this.commentByName = commentByName;
     }
 }

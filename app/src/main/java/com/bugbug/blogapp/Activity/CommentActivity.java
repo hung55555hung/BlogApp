@@ -3,10 +3,7 @@ package com.bugbug.blogapp.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,7 +46,6 @@ public class CommentActivity extends AppCompatActivity {
 
         initialize();
         loadPostDetails();
-        loadPostedByUser();
         bindCommentCount();
         bindLikeState();
         setupCommentRecyclerView();
@@ -63,7 +59,6 @@ public class CommentActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         postId = intent.getStringExtra("postId");
-        postedBy = intent.getStringExtra("postedBy");
 
         binding.btnReturn.setOnClickListener(v->{finish();});
     }
@@ -77,13 +72,15 @@ public class CommentActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Post post = snapshot.getValue(Post.class);
                         if (post == null) return;
-
-                        PostImageAdapter adapter=new PostImageAdapter(CommentActivity.this,post.getPostImages());
-                        binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(CommentActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                        binding.imagesRecyclerView.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
-
+                        if(post.getPostImages()!=null|| !post.getPostImages().isEmpty()){
+                            PostImageAdapter adapter=new PostImageAdapter(CommentActivity.this,post.getPostImages());
+                            binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(CommentActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                            binding.imagesRecyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                        }
+                        postedBy=post.getPostedBy();
                         binding.postDescription.setText(post.getPostDescription());
+                        loadPostedByUser();
 
                     }
 
@@ -96,7 +93,7 @@ public class CommentActivity extends AppCompatActivity {
         database.getReference()
                 .child("Users")
                 .child(postedBy)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String name = snapshot.child("name").getValue(String.class);
@@ -131,25 +128,30 @@ public class CommentActivity extends AppCompatActivity {
             comment.setCommentAt(new Date().getTime());
             comment.setCommentedBy(auth.getUid());
 
-            database.getReference()
-                    .child("Posts")
+            DatabaseReference commentRef = database.getReference()
+                    .child("Comments")
                     .child(postId)
-                    .child("comments")
-                    .push()
-                    .setValue(comment)
-                    .addOnSuccessListener(un->{
-                        Notification notification=new Notification();
+                    .push();
+            String commentId = commentRef.getKey();
+            comment.setCommentId(commentId);
+
+            commentRef.setValue(comment)
+                    .addOnSuccessListener(un -> {
+                        Notification notification = new Notification();
                         notification.setSenderId(auth.getCurrentUser().getUid());
                         notification.setTimestamp(new Date().getTime());
                         notification.setPostId(postId);
                         notification.setReceiverId(postedBy);
                         notification.setActionType("Comment");
-
                         database.getReference().child("Notification")
                                 .child(postedBy)
                                 .push()
                                 .setValue(notification);
+
                         binding.commentEt.setText("");
+                        commentList.add(comment);
+                        commentAdapter.notifyDataSetChanged();
+
                         InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                     });
@@ -159,10 +161,8 @@ public class CommentActivity extends AppCompatActivity {
     private void bindCommentCount() {
         DatabaseReference commentCountRef = FirebaseDatabase.getInstance()
                 .getReference()
-                .child("Posts")
-                .child(postId)
-                .child("comments");
-
+                .child("Comments")
+                .child(postId);
         commentCountRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -170,24 +170,21 @@ public class CommentActivity extends AppCompatActivity {
                 binding.comment.setText(commentCount + " Comments");
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
     private void setupCommentRecyclerView() {
-        commentAdapter = new CommentAdapter(this, commentList);
+        commentAdapter = new CommentAdapter(this, commentList, postId);
         binding.commentRv.setLayoutManager(new LinearLayoutManager(this));
         binding.commentRv.setAdapter(commentAdapter);
     }
 
     private void loadComments() {
         database.getReference()
-                .child("Posts")
+                .child("Comments")
                 .child(postId)
-                .child("comments")
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         commentList.clear();
@@ -195,7 +192,7 @@ public class CommentActivity extends AppCompatActivity {
                         for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
                             Comment comment = commentSnapshot.getValue(Comment.class);
                             if (comment == null) continue;
-
+                            comment.setCommentId(commentSnapshot.getKey());
                             fetchUserNameForComment(comment);
                         }
                     }
@@ -216,7 +213,7 @@ public class CommentActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String name = snapshot.getValue(String.class);
-                        comment.setComentByName(name);
+                        comment.setCommentByName(name);
                         commentList.add(comment);
                         commentAdapter.notifyDataSetChanged();
                     }
@@ -236,7 +233,7 @@ public class CommentActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int realTimeLikeCount = (int) snapshot.getChildrenCount();
-                binding.like.setText(realTimeLikeCount + "");
+                binding.like.setText(realTimeLikeCount + " Likes");
 
                 boolean isLiked = snapshot.hasChild(auth.getUid());
                 binding.like.setCompoundDrawablesWithIntrinsicBounds(

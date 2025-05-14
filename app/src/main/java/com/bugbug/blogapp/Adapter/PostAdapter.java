@@ -85,6 +85,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         private void loadPostImage(Post post) {
+            if(post.getPostImages()==null|| post.getPostImages().isEmpty()){
+                return;
+            }
             PostImageAdapter adapter=new PostImageAdapter(context,post.getPostImages());
             binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             binding.imagesRecyclerView.setAdapter(adapter);
@@ -194,10 +197,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         private void bindCommentCount(String postId) {
             DatabaseReference commentCountRef = FirebaseDatabase.getInstance()
                     .getReference()
-                    .child("Posts")
-                    .child(postId)
-                    .child("comments");
-
+                    .child("Comments")
+                    .child(postId);
             commentCountRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -205,9 +206,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     binding.comment.setText(commentCount + " Comments");
                 }
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
         }
     }

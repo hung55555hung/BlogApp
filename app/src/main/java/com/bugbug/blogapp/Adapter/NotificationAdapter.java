@@ -69,6 +69,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         if(model.getActionType().equals("Comment")){
                             holder.notification.setText(Html.fromHtml("<b>"+user.getName()+"</b>"+" commented your post"));
                         }
+                        if(model.getActionType().equals("LikeComment")){
+                            holder.notification.setText(Html.fromHtml("<b>"+user.getName()+"</b>"+" liked your comment"));
+                        }
                         if(model.getActionType().equals("Follow")){
                             holder.notification.setText(Html.fromHtml("<b>"+user.getName()+"</b>"+" started following you"));
                         }
@@ -98,10 +101,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 .child(notification.getId())
                 .child("checkOpen")
                 .setValue(true);
-        if(notification.getActionType().equals("Like") || notification.getActionType().equals("Comment")){
+        if(notification.getActionType().equals("Like") || notification.getActionType().equals("Comment")||notification.getActionType().equals("LikeComment")){
             Intent intent=new Intent(context, CommentActivity.class);
             intent.putExtra("postId",notification.getPostId());
-            intent.putExtra("postedBy",notification.getReceiverId());
             context.startActivity(intent);
         }else{
             Intent intent=new Intent(context, UserProfileActivity.class);
