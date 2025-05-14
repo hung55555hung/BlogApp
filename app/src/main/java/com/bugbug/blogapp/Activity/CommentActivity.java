@@ -1,9 +1,11 @@
 package com.bugbug.blogapp.Activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bugbug.blogapp.Adapter.CommentAdapter;
+import com.bugbug.blogapp.Adapter.PostImageAdapter;
 import com.bugbug.blogapp.Model.Comment;
 import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
@@ -19,6 +22,7 @@ import com.bugbug.blogapp.databinding.ActivityCommentBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -46,6 +50,8 @@ public class CommentActivity extends AppCompatActivity {
         initialize();
         loadPostDetails();
         loadPostedByUser();
+        bindCommentCount();
+        bindLikeState();
         setupCommentRecyclerView();
         loadComments();
         setupPostCommentButton();
@@ -66,20 +72,19 @@ public class CommentActivity extends AppCompatActivity {
         database.getReference()
                 .child("Posts")
                 .child(postId)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Post post = snapshot.getValue(Post.class);
                         if (post == null) return;
 
-                        Picasso.get()
-                                .load(post.getPostImage())
-                                .placeholder(R.drawable.placeholder)
-                                .into(binding.postImg);
+                        PostImageAdapter adapter=new PostImageAdapter(CommentActivity.this,post.getPostImages());
+                        binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(CommentActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                        binding.imagesRecyclerView.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
 
                         binding.postDescription.setText(post.getPostDescription());
-                        binding.like.setText(post.getPostLikes()+" Likes");
-                        binding.comment.setText(post.getCommentCount()+ " Comments");
+
                     }
 
                     @Override
@@ -132,30 +137,7 @@ public class CommentActivity extends AppCompatActivity {
                     .child("comments")
                     .push()
                     .setValue(comment)
-                    .addOnSuccessListener(unused -> updateCommentCount());
-
-        });
-    }
-
-    private void updateCommentCount() {
-        database.getReference()
-                .child("Posts")
-                .child(postId)
-                .child("commentCount")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int currentCount = snapshot.exists() ? snapshot.getValue(Integer.class) : 0;
-
-                        database.getReference()
-                                .child("Posts")
-                                .child(postId)
-                                .child("commentCount")
-                                .setValue(currentCount + 1)
-                                .addOnSuccessListener(unused -> {
-                                    Toast.makeText(CommentActivity.this, "Commented", Toast.LENGTH_SHORT).show();
-                                    binding.commentEt.setText("");
-                                });
+                    .addOnSuccessListener(un->{
                         Notification notification=new Notification();
                         notification.setSenderId(auth.getCurrentUser().getUid());
                         notification.setTimestamp(new Date().getTime());
@@ -167,11 +149,31 @@ public class CommentActivity extends AppCompatActivity {
                                 .child(postedBy)
                                 .push()
                                 .setValue(notification);
-                    }
+                        binding.commentEt.setText("");
+                        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    });
+        });
+    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
-                });
+    private void bindCommentCount() {
+        DatabaseReference commentCountRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Posts")
+                .child(postId)
+                .child("comments");
+
+        commentCountRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long commentCount = snapshot.getChildrenCount();
+                binding.comment.setText(commentCount + " Comments");
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void setupCommentRecyclerView() {
@@ -223,10 +225,77 @@ public class CommentActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
+    private void bindLikeState() {
+        DatabaseReference likesRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Posts")
+                .child(postId)
+                .child("likes");
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        finish();
-        return true;
+        likesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int realTimeLikeCount = (int) snapshot.getChildrenCount();
+                binding.like.setText(realTimeLikeCount + "");
+
+                boolean isLiked = snapshot.hasChild(auth.getUid());
+                binding.like.setCompoundDrawablesWithIntrinsicBounds(
+                        isLiked ? R.drawable.ic_heart_red : R.drawable.ic_heart,
+                        0, 0, 0
+                );
+
+                binding.like.setOnClickListener(view -> toggleLike(isLiked));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+    private void toggleLike(boolean isLiked) {
+        DatabaseReference postRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Posts")
+                .child(postId);
+
+        DatabaseReference likeRef = postRef
+                .child("likes")
+                .child(auth.getUid());
+
+        if (isLiked) {
+            likeRef.removeValue();
+            DatabaseReference notificationRef = FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("Notification")
+                    .child(postedBy);
+            notificationRef.orderByChild("postId")
+                    .equalTo(postId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Notification notification = snapshot.getValue(Notification.class);
+                                if (notification != null && notification.getSenderId().equals(auth.getUid()) && notification.getActionType().equals("Like")) {
+                                    snapshot.getRef().removeValue();
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
+                    });
+        } else {
+            likeRef.setValue(true);
+            Notification notification=new Notification();
+            notification.setSenderId(auth.getUid());
+            notification.setTimestamp(new Date().getTime());
+            notification.setPostId(postId);
+            notification.setReceiverId(postedBy);
+            notification.setActionType("Like");
+
+            FirebaseDatabase.getInstance().getReference()
+                    .child("Notification")
+                    .child(postedBy)
+                    .push()
+                    .setValue(notification);
+        }
     }
 }
