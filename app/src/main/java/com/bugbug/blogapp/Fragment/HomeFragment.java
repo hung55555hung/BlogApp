@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ public class HomeFragment extends Fragment {
     ShapeableImageView addStory;
     ActivityResultLauncher<String> galleryLauncher;
     ProgressDialog dialog;
+    String sharedBy;
 
     public HomeFragment() {
 
@@ -147,7 +149,50 @@ public class HomeFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {}
 
         });
+
+        // Lấy danh sách bài post được chia sẻ từ UserShares
+        String currentUserId = auth.getCurrentUser().getUid();
+        sharedBy = currentUserId;
+        database.getReference().child("UserShares").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot userid : snapshot.getChildren()) {
+                        for (DataSnapshot postId : userid.getChildren()) {
+                            String postIdValue = postId.getKey();
+                                fetchSharedPost(postIdValue, userid.getKey());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error loading shared posts: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view;
+    }
+
+    private void fetchSharedPost(String postId, String sharedBy) {
+        database.getReference().child("Posts").child(postId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Post post = snapshot.getValue(Post.class);
+                if (post != null) {
+                    post.setShared(true);
+                    post.setSharedBy(sharedBy);
+                    postList.add(post);
+                    dasboardRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("HomeFragment", "Error fetching shared post: " + error.getMessage());
+            }
+        });
     }
 
     private void uploadImageToFirebase(Uri uri) {

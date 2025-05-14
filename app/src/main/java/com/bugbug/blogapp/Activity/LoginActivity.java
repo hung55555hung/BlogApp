@@ -1,11 +1,14 @@
 package com.bugbug.blogapp.Activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
+import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityLoginBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,12 +18,27 @@ public class LoginActivity extends AppCompatActivity {
     ActivityLoginBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        boolean isFirstTime = prefs.getBoolean("isFirstTime", true);
+
+        if (isFirstTime) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("isFirstTime", false);
+            editor.apply();
+
+            Intent intent = new Intent(this, IntroActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         mAuth = FirebaseAuth.getInstance();
         currentUser=mAuth.getCurrentUser();
