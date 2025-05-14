@@ -73,4 +73,6 @@ dependencies {
 
     implementation ("com.github.OMARIHAMZA:StoryView:1.0.2-alpha")
 
+    implementation ("com.github.AppIntro:AppIntro:6.3.1")
+
 }
