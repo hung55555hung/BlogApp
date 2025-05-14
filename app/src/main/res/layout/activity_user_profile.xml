@@ -135,13 +135,13 @@
                 android:layout_height="@dimen/_90mdp"
                 android:padding="4dp"
                 android:src="@drawable/avatar_default"
-                diagonal:civ_border_color="#D1D1D1"
-                diagonal:civ_border_width="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
                 app:layout_constraintEnd_toEndOf="@+id/linearLayout"
                 app:layout_constraintStart_toStartOf="@+id/linearLayout"
                 app:layout_constraintTop_toTopOf="@+id/linearLayout"
-                app:layout_constraintVertical_bias="1.0" />
+                app:layout_constraintVertical_bias="1.0"
+                diagonal:civ_border_color="#D1D1D1"
+                diagonal:civ_border_width="5dp" />
 
             <TextView
                 android:id="@+id/tvFullName"
@@ -172,12 +172,12 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                diagonal:cardCornerRadius="10dp"
-                diagonal:cardElevation="5dp"
-                diagonal:cardMaxElevation="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvProfession">
+                app:layout_constraintTop_toBottomOf="@+id/tvProfession"
+                diagonal:cardCornerRadius="10dp"
+                diagonal:cardElevation="5dp"
+                diagonal:cardMaxElevation="5dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -226,7 +226,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#FFFFFF"
-                        android:text="Friends"
+                        android:text="Followings"
                         android:textSize="@dimen/_14font_mdp"
                         app:layout_constraintEnd_toStartOf="@+id/view5"
                         app:layout_constraintHorizontal_bias="0.5"
@@ -234,7 +234,7 @@
                         app:layout_constraintTop_toTopOf="@+id/view4" />
 
                     <TextView
-                        android:id="@+id/tvFriend"
+                        android:id="@+id/tvFolloing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="232"
@@ -278,6 +278,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/textView4" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
+
             <TextView
                 android:id="@+id/tvBio"
                 android:layout_width="0dp"
@@ -291,28 +292,98 @@
                 app:layout_constraintEnd_toEndOf="@+id/cardView"
                 app:layout_constraintStart_toStartOf="@+id/cardView"
                 app:layout_constraintTop_toBottomOf="@+id/cardView" />
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:background="#D1D1D1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvBio" />
+
+            <TextView
+                android:id="@+id/tv55"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Profile"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16font_mdp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/cardView"
+                app:layout_constraintTop_toBottomOf="@+id/view" />
+
+            <TextView
+                android:id="@+id/tvLiveIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Lives in"
+                android:drawableStart="@drawable/baseline_house_24"
+                android:drawablePadding="5dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15font_mdp"
+                app:layout_constraintStart_toStartOf="@+id/tv55"
+                app:layout_constraintTop_toBottomOf="@+id/tv55" />
+
+            <TextView
+                android:id="@+id/liveIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Da Nang"
+                android:textSize="@dimen/_15font_mdp"
+                android:layout_marginStart="5dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvLiveIn"
+                app:layout_constraintStart_toEndOf="@+id/tvLiveIn"
+                app:layout_constraintTop_toTopOf="@+id/tvLiveIn" />
+            <TextView
+                android:id="@+id/tvWorkAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Works at"
+                android:drawableStart="@drawable/baseline_business_center_24"
+                android:drawablePadding="5dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15font_mdp"
+                app:layout_constraintStart_toStartOf="@+id/tvLiveIn"
+                app:layout_constraintTop_toBottomOf="@+id/tvLiveIn" />
+
+            <TextView
+                android:id="@+id/workAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Da Nang"
+                android:textSize="@dimen/_15font_mdp"
+                android:layout_marginStart="5dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvWorkAt"
+                app:layout_constraintStart_toEndOf="@+id/tvWorkAt"
+                app:layout_constraintTop_toTopOf="@+id/tvWorkAt" />
+
+            <View
+                android:id="@+id/view55"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="#D1D1D1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvWorkAt" />
 
             <TextView
                 android:id="@+id/tvPostBy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="8dp"
                 android:text="Alexander's Posts"
-                android:textStyle="bold"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_16font_mdp"
-                app:layout_constraintStart_toStartOf="@+id/cardView"
-                app:layout_constraintTop_toBottomOf="@+id/tvBio" />
-            <View
-                android:id="@+id/view"
-                android:layout_width="wrap_content"
-                android:layout_height="2dp"
-                android:layout_marginTop="2dp"
-                android:background="#D1D1D1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvPostBy" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/tv55"
+                app:layout_constraintTop_toBottomOf="@+id/view55" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/postRv"

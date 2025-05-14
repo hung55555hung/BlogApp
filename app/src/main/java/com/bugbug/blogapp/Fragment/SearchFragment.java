@@ -19,15 +19,19 @@ import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.FragmentSearchBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class SearchFragment extends Fragment {
-    private static final long DEBOUNCE_DELAY = 600;
+    private static final long DEBOUNCE_DELAY = 500;
+    private static final int INITIAL_LOAD_COUNT = 10;
+    private static final int LOAD_MORE_COUNT = 5;
 
     FragmentSearchBinding binding;
     BottomNavigationView bottomNav;
@@ -36,10 +40,13 @@ public class SearchFragment extends Fragment {
     UserAdapter userAdapter;
     ArrayList<User> list = new ArrayList<>();
     RecyclerView recyclerView;
+    FirebaseDatabase database;
 
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-    FirebaseDatabase database;
+    private boolean isLoading = false;
+    private String lastKey = null;
+    private boolean isLastPage = false;
 
     public SearchFragment() {
     }
@@ -61,7 +68,18 @@ public class SearchFragment extends Fragment {
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(userAdapter);
 
-        loadTopUsers();
+        // Add scroll listener for loading more users
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!isLoading && !isLastPage && !recyclerView.canScrollVertically(1)) {
+                    loadMoreUsers();
+                }
+            }
+        });
+
+        loadTopUsers(INITIAL_LOAD_COUNT, null);
 
         binding.searchBar.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -158,26 +176,58 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void loadTopUsers() {
-        database.getReference().child("Users")
-                .orderByChild("numberFollower")
-                .limitToLast(10)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        topUsersList.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            User user = dataSnapshot.getValue(User.class);
-                            topUsersList.add(user);
-                        }
-                        Collections.reverse(topUsersList);
-                        list.clear();
-                        list.addAll(topUsersList);
-                        userAdapter.notifyDataSetChanged();
-                    }
+    private void loadTopUsers(int limit, String startAfter) {
+        if (isLoading || isLastPage) return;
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
-                });
+        isLoading = true;
+        Query query = database.getReference().child("Users")
+                .orderByChild("numberFollower")
+                .limitToLast(limit);
+
+        if (startAfter != null) {
+            query = query.endAt(Double.parseDouble(startAfter));
+        }
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<User> tempList = new ArrayList<>();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (user != null && !user.getUserID().equals(FirebaseAuth.getInstance().getUid())) {
+                        tempList.add(user);
+                        if (lastKey == null || user.getNumberFollower() < Double.parseDouble(lastKey)) {
+                            lastKey = String.valueOf(user.getNumberFollower());
+                        }
+                    }
+                }
+
+                if (tempList.size() < limit) {
+                    isLastPage = true;
+                }
+
+                Collections.reverse(tempList);
+                if (startAfter == null) {
+                    topUsersList.clear();
+                    topUsersList.addAll(tempList);
+                    list.clear();
+                    list.addAll(topUsersList);
+                } else {
+                    topUsersList.addAll(tempList);
+                    list.addAll(tempList);
+                }
+                userAdapter.notifyDataSetChanged();
+                isLoading = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                isLoading = false;
+            }
+        });
+    }
+
+    private void loadMoreUsers() {
+        loadTopUsers(LOAD_MORE_COUNT, lastKey);
     }
 }
