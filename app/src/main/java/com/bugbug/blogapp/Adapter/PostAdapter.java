@@ -1,5 +1,6 @@
 package com.bugbug.blogapp.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -280,6 +281,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             userSharesRef.setValue(true)
                     .addOnSuccessListener(aVoid -> {
                         postSharesRef.setValue(true);
+                        ((Activity) context).recreate();
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(context, "Failed to share post: " + e.getMessage(), Toast.LENGTH_SHORT).show();
