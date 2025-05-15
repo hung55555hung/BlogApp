@@ -1,7 +1,6 @@
 package com.bugbug.blogapp.Fragment;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -89,6 +88,7 @@ public class HomeFragment extends Fragment {
         StoryAdapter storyAdapter = new StoryAdapter(storyList, getContext(), () -> {
             galleryLauncher.launch("image/*");
         });
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         storyRecyclerView.setLayoutManager(linearLayoutManager);
         storyRecyclerView.setNestedScrollingEnabled(false);
@@ -112,7 +112,6 @@ public class HomeFragment extends Fragment {
                             stories.add(userStory);
                         }
                         story.setStories(stories);
-
                         storyList.add(story);
                     }
                     storyAdapter.notifyDataSetChanged();
@@ -153,16 +152,17 @@ public class HomeFragment extends Fragment {
         // Lấy danh sách bài post được chia sẻ từ UserShares
         String currentUserId = auth.getCurrentUser().getUid();
         sharedBy = currentUserId;
-        database.getReference().child("UserShares").addValueEventListener(new ValueEventListener() {
+        database.getReference().child("UserShares").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot userid : snapshot.getChildren()) {
                         for (DataSnapshot postId : userid.getChildren()) {
                             String postIdValue = postId.getKey();
-                                fetchSharedPost(postIdValue, userid.getKey());
+                            fetchSharedPost(postIdValue, userid.getKey());
                         }
                     }
+                    postAdapter.notifyDataSetChanged();
                 }
             }
 
