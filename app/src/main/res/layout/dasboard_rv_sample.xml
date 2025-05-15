@@ -62,7 +62,7 @@
             app:layout_constraintTop_toBottomOf="@+id/userName" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/menu"
             android:layout_width="18dp"
             android:layout_height="18dp"
             app:layout_constraintBottom_toBottomOf="@+id/profile_image"

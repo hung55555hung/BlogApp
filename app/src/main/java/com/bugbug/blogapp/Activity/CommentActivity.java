@@ -72,7 +72,7 @@ public class CommentActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Post post = snapshot.getValue(Post.class);
                         if (post == null) return;
-                        if(post.getPostImages()!=null|| !post.getPostImages().isEmpty()){
+                        if(post.getPostImages()!=null){
                             PostImageAdapter adapter=new PostImageAdapter(CommentActivity.this,post.getPostImages());
                             binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(CommentActivity.this, LinearLayoutManager.HORIZONTAL, false));
                             binding.imagesRecyclerView.setAdapter(adapter);

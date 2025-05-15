@@ -69,6 +69,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         public void bind(Post post) {
+            if(!post.getPostedBy().equals(currentUserId)){
+                binding.menu.setVisibility(View.GONE);
+            }
             loadPostImage(post);
             binding.postDescription.setText(post.getPostDescription());
             binding.comment.setOnClickListener(new View.OnClickListener() {

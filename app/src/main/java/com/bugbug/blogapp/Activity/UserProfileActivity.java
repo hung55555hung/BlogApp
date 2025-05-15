@@ -121,7 +121,6 @@ public class UserProfileActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        //Load photo
 
 
         //Load post by user
@@ -136,6 +135,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 postList.clear();
+                binding.tvPosts.setText(snapshot.getChildrenCount()+"");
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String postId = dataSnapshot.getKey();
                     database.getReference().child("Posts").child(postId)
