@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popupLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup_background"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:elevation="8dp">
+
+    <TextView
+        android:id="@+id/editProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Edit Profile"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_edit_profile_image"
+        android:drawablePadding="8dp" />
+
+    <TextView
+        android:id="@+id/changePassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Change Password"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_change_pass"
+        android:drawablePadding="8dp" />
+
+    <TextView
+        android:id="@+id/logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Logout"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_logout"
+        android:drawablePadding="8dp" />
+</LinearLayout>
