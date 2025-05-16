@@ -4,6 +4,7 @@ import static androidx.core.content.ContextCompat.startActivity;
 import static java.security.AccessController.getContext;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,6 +46,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private final ArrayList<Post> postList;
     private final Context context;
     private final String currentUserId;
+    ProgressDialog dialog;
 
     public PostAdapter(ArrayList<Post> postList, Context context) {
         this.postList = postList;
@@ -138,6 +140,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             popupWindow.showAsDropDown(v, -476, -50);
         }
         private void removePost(Post post){
+            dialog = new ProgressDialog(this.itemView.getContext());
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setTitle("Deleting post");
+            dialog.setMessage("Please wait...");
+            dialog.setCancelable(false);
+            dialog.show();
             List<String> imageUrls = post.getPostImages();
             if (imageUrls != null && !imageUrls.isEmpty()) {
                 CloudinaryUtil.deleteImages(imageUrls, new CloudinaryUtil.DeleteImagesResultListener() {
@@ -172,8 +180,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             .getReference("UserPosts")
                             .child(currentUserId)
                             .child(post.getPostId()).removeValue();
+                    dialog.dismiss();
                     Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
                 } else {
+                    dialog.dismiss();
                     Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show();
                 }
             });

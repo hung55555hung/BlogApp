@@ -55,8 +55,8 @@ public class PostImageAdapter extends RecyclerView.Adapter<PostImageAdapter.View
 
         if (isSingleImage) {
             imageParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            imageParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            holder.imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            holder.imageView.setMaxHeight((int) (400 * density));
+            holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             //holder.imageView.setMaxHeight((int) (MAX_HEIGHT_DP * density));
         } else {
             imageParams.width =  ViewGroup.LayoutParams.WRAP_CONTENT;

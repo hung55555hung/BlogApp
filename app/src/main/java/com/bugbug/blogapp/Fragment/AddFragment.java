@@ -61,12 +61,6 @@ public class AddFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dialog = new ProgressDialog(requireContext());
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setTitle("Post Uploading");
-        dialog.setMessage("Please wait...");
-        dialog.setCancelable(false);
-
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -162,6 +156,11 @@ public class AddFragment extends Fragment {
     }
 
     private void uploadPost() {
+        dialog = new ProgressDialog(requireContext());
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setTitle("Uploading post");
+        dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
         dialog.show();
         String userId = currentUser.getUid();
         String postDescription = binding.postDescription.getText().toString();
@@ -182,7 +181,6 @@ public class AddFragment extends Fragment {
                 public void onSuccess(List<String> imageUrls) {
                     post.setPostImages(new ArrayList<>(imageUrls));
                     savePost(post, postId);
-                    dialog.dismiss();
                 }
 
                 @Override
