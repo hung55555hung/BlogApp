@@ -61,12 +61,6 @@ public class AddFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dialog = new ProgressDialog(requireContext());
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setTitle("Post Uploading");
-        dialog.setMessage("Please wait...");
-        dialog.setCancelable(false);
-
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -104,7 +98,6 @@ public class AddFragment extends Fragment {
         binding.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.imagesRecyclerView.setAdapter(imageAdapter);
 
-
         database.getReference().child("Users")
                 .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -118,7 +111,7 @@ public class AddFragment extends Fragment {
                         } else {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avt)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.profileImage);
                         }
                     }
@@ -163,6 +156,11 @@ public class AddFragment extends Fragment {
     }
 
     private void uploadPost() {
+        dialog = new ProgressDialog(requireContext());
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setTitle("Uploading post");
+        dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
         dialog.show();
         String userId = currentUser.getUid();
         String postDescription = binding.postDescription.getText().toString();
@@ -183,7 +181,6 @@ public class AddFragment extends Fragment {
                 public void onSuccess(List<String> imageUrls) {
                     post.setPostImages(new ArrayList<>(imageUrls));
                     savePost(post, postId);
-                    dialog.dismiss();
                 }
 
                 @Override
@@ -244,7 +241,5 @@ public class AddFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        CloudinaryUtil.shutdown();
-        dialog.dismiss();
     }
 }

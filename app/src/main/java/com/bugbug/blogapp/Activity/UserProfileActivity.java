@@ -61,7 +61,18 @@ public class UserProfileActivity extends AppCompatActivity {
                         binding.tvFullName.setText(user.getName());
                         binding.tvProfession.setText(user.getProfession());
                         binding.tvBio.setText(user.getBio());
+                        if(user.getAddress()==null ||user.getAddress().isEmpty()){
+                            binding.liveIn.setText("Not update yet");
+                        }else{
+                            binding.liveIn.setText(user.getAddress());
+                        }
+                        if(user.getWorkAt()==null||user.getWorkAt().isEmpty()){
+                            binding.workAt.setText("Not update yet");
+                        }else{
+                            binding.workAt.setText(user.getWorkAt());
+                        }
                         binding.tvPostBy.setText(user.getName()+"' s Posts");
+
 
                         String coverPhoto = user.getCoverPhoto();
                         if (coverPhoto == null || coverPhoto.isEmpty()) {
@@ -69,7 +80,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         } else {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avt)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.avatarImg);
                         }
                     }
@@ -99,8 +110,18 @@ public class UserProfileActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
-        //Load friend
-        //Load photo
+        //Load following
+        database.getReference().child("Followings").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long followingCount=snapshot.getChildrenCount();
+                binding.tvFolloing.setText(followingCount+"");
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
+
 
         //Load post by user
         postList = new ArrayList<>();
@@ -114,6 +135,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 postList.clear();
+                binding.tvPosts.setText(snapshot.getChildrenCount()+"");
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String postId = dataSnapshot.getKey();
                     database.getReference().child("Posts").child(postId)
@@ -185,12 +207,12 @@ public class UserProfileActivity extends AppCompatActivity {
         if ( coverPhoto == null ||  coverPhoto.isEmpty()) {
             Picasso.get()
                     .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
-                    .placeholder(R.drawable.avt)
+                    .placeholder(R.drawable.avatar_default)
                     .into(binding.profileImage);
         } else {
             Picasso.get()
                     .load(coverPhoto)
-                    .placeholder(R.drawable.avt)
+                    .placeholder(R.drawable.avatar_default)
                     .into(binding.profileImage);
         }
         binding.titleText.setText("Unfollow "+user.getName()+"?");

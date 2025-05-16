@@ -6,243 +6,327 @@
     android:layout_height="match_parent"
     tools:context=".Fragment.ProfileFragment"
     >
-
-    <!-- TODO: Update blank fragment layout -->
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        diagonal:layout_constraintEnd_toEndOf="parent"
-        diagonal:layout_constraintHorizontal_bias="0.5"
-        diagonal:layout_constraintStart_toStartOf="parent"
-        diagonal:layout_constraintTop_toTopOf="parent">
-
-        <com.github.florent37.diagonallayout.DiagonalLayout
-            android:id="@+id/diagonalLayout"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_220mdp"
-            android:background="#EBE7E7"
-            android:elevation="30dp"
-            diagonal:diagonal_angle="10"
-            diagonal:diagonal_direction="left"
-
-            diagonal:diagonal_position="bottom">
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/background_image" />
-
-            <View
-                android:id="@+id/view2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </com.github.florent37.diagonallayout.DiagonalLayout>
-    </LinearLayout>
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="@dimen/_90mdp"
-        android:layout_height="@dimen/_90mdp"
-        android:padding="4dp"
-        android:src="@drawable/avatar_default"
-        diagonal:civ_border_color="@color/white"
-        diagonal:civ_border_width="5dp"
-        diagonal:layout_constraintBottom_toBottomOf="@+id/linearLayout"
-        diagonal:layout_constraintEnd_toEndOf="@+id/linearLayout"
-        diagonal:layout_constraintStart_toStartOf="@+id/linearLayout"
-        diagonal:layout_constraintTop_toTopOf="@+id/linearLayout"
-        diagonal:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/textViewName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:fontFamily="@font/acme"
-        android:text="Petter"
-        android:textColor="@color/black"
-        android:textSize="@dimen/_14font_mdp"
-        diagonal:layout_constraintEnd_toEndOf="@+id/profile_image"
-        diagonal:layout_constraintStart_toStartOf="@+id/profile_image"
-        diagonal:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-    <ImageView
-        android:id="@+id/imageViewSetting"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="Settings Icon"
-        android:src="@drawable/ic_settings"
-        diagonal:layout_constraintEnd_toEndOf="parent"
-        diagonal:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textViewProfession"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="AI Developer"
-        android:textSize="@dimen/_10font_mdp"
-        diagonal:layout_constraintEnd_toEndOf="@+id/textViewName"
-        diagonal:layout_constraintStart_toStartOf="@+id/textViewName"
-        diagonal:layout_constraintTop_toBottomOf="@+id/textViewName" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        diagonal:cardCornerRadius="10dp"
-        diagonal:cardElevation="5dp"
-        diagonal:cardMaxElevation="5dp"
-        diagonal:layout_constraintEnd_toEndOf="parent"
-        diagonal:layout_constraintHorizontal_bias="0.5"
-        diagonal:layout_constraintStart_toStartOf="parent"
-        diagonal:layout_constraintTop_toBottomOf="@+id/textViewProfession">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="4dp">
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Followers"
-                android:textSize="@dimen/_14font_mdp"
-                diagonal:layout_constraintEnd_toStartOf="@+id/view4"
+                android:orientation="vertical"
+                diagonal:layout_constraintEnd_toEndOf="parent"
                 diagonal:layout_constraintHorizontal_bias="0.5"
                 diagonal:layout_constraintStart_toStartOf="parent"
+                diagonal:layout_constraintTop_toTopOf="parent">
+
+                <com.github.florent37.diagonallayout.DiagonalLayout
+                    android:id="@+id/diagonalLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_220mdp"
+                    android:background="#EBE7E7"
+                    android:elevation="30dp"
+                    diagonal:diagonal_angle="10"
+                    diagonal:diagonal_direction="left"
+
+                    diagonal:diagonal_position="bottom">
+
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/background_image" />
+
+                    <View
+                        android:id="@+id/view2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </com.github.florent37.diagonallayout.DiagonalLayout>
+            </LinearLayout>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image"
+                android:layout_width="@dimen/_90mdp"
+                android:layout_height="@dimen/_90mdp"
+                android:padding="4dp"
+                android:src="@drawable/avatar_default"
+                diagonal:civ_border_color="@color/white"
+                diagonal:civ_border_width="5dp"
+                diagonal:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+                diagonal:layout_constraintEnd_toEndOf="@+id/linearLayout"
+                diagonal:layout_constraintStart_toStartOf="@+id/linearLayout"
+                diagonal:layout_constraintTop_toTopOf="@+id/linearLayout"
+                diagonal:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/textViewName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Petter"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14font_mdp"
+                diagonal:layout_constraintEnd_toEndOf="@+id/profile_image"
+                diagonal:layout_constraintStart_toStartOf="@+id/profile_image"
+                diagonal:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+            <ImageView
+                android:id="@+id/imageViewSetting"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Settings Icon"
+                android:src="@drawable/ic_settings"
+                diagonal:layout_constraintEnd_toEndOf="parent"
                 diagonal:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textViewNumberFollowers"
+                android:id="@+id/textViewProfession"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5332"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_16font_mdp"
-                diagonal:layout_constraintEnd_toEndOf="@+id/textView5"
-                diagonal:layout_constraintStart_toStartOf="@+id/textView5"
-                diagonal:layout_constraintTop_toBottomOf="@+id/textView5" />
+                android:text="AI Developer"
+                android:textSize="@dimen/_10font_mdp"
+                diagonal:layout_constraintEnd_toEndOf="@+id/textViewName"
+                diagonal:layout_constraintStart_toStartOf="@+id/textViewName"
+                diagonal:layout_constraintTop_toBottomOf="@+id/textViewName" />
 
-            <View
-                android:id="@+id/view4"
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:background="#A6A5A5"
-                diagonal:layout_constraintBottom_toBottomOf="parent"
-                diagonal:layout_constraintEnd_toStartOf="@+id/textView3"
-                diagonal:layout_constraintHorizontal_bias="0.5"
-                diagonal:layout_constraintStart_toEndOf="@+id/textView5"
-                diagonal:layout_constraintTop_toTopOf="@+id/textView5" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:text="Friends"
-                android:textSize="@dimen/_14font_mdp"
-                diagonal:layout_constraintEnd_toStartOf="@+id/view5"
-                diagonal:layout_constraintHorizontal_bias="0.5"
-                diagonal:layout_constraintStart_toEndOf="@+id/view4"
-                diagonal:layout_constraintTop_toTopOf="@+id/view4" />
-
-            <TextView
-                android:id="@+id/textViewNumberFriends"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="232"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_16font_mdp"
-                diagonal:layout_constraintEnd_toEndOf="@+id/textView3"
-                diagonal:layout_constraintStart_toStartOf="@+id/textView3"
-                diagonal:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-            <View
-                android:id="@+id/view5"
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:background="#A6A5A5"
-                diagonal:layout_constraintBottom_toBottomOf="parent"
-                diagonal:layout_constraintEnd_toStartOf="@+id/textView4"
-                diagonal:layout_constraintHorizontal_bias="0.5"
-                diagonal:layout_constraintStart_toEndOf="@+id/textView3"
-                diagonal:layout_constraintTop_toTopOf="@+id/textView3" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Photos"
-                android:textSize="@dimen/_14font_mdp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                diagonal:cardCornerRadius="10dp"
+                diagonal:cardElevation="5dp"
+                diagonal:cardMaxElevation="5dp"
                 diagonal:layout_constraintEnd_toEndOf="parent"
                 diagonal:layout_constraintHorizontal_bias="0.5"
-                diagonal:layout_constraintStart_toEndOf="@+id/view5"
-                diagonal:layout_constraintTop_toTopOf="@+id/view5" />
+                diagonal:layout_constraintStart_toStartOf="parent"
+                diagonal:layout_constraintTop_toBottomOf="@+id/textViewProfession">
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        android:id="@+id/textView5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Followers"
+                        android:textSize="@dimen/_14font_mdp"
+                        diagonal:layout_constraintEnd_toStartOf="@+id/view4"
+                        diagonal:layout_constraintHorizontal_bias="0.5"
+                        diagonal:layout_constraintStart_toStartOf="parent"
+                        diagonal:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvFollower"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5332"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_16font_mdp"
+                        diagonal:layout_constraintEnd_toEndOf="@+id/textView5"
+                        diagonal:layout_constraintStart_toStartOf="@+id/textView5"
+                        diagonal:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+                    <View
+                        android:id="@+id/view4"
+                        android:layout_width="1dp"
+                        android:layout_height="0dp"
+                        android:background="#A6A5A5"
+                        diagonal:layout_constraintBottom_toBottomOf="parent"
+                        diagonal:layout_constraintEnd_toStartOf="@+id/textView3"
+                        diagonal:layout_constraintHorizontal_bias="0.5"
+                        diagonal:layout_constraintStart_toEndOf="@+id/textView5"
+                        diagonal:layout_constraintTop_toTopOf="@+id/textView5" />
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:text="Following"
+                        android:textSize="@dimen/_14font_mdp"
+                        diagonal:layout_constraintEnd_toStartOf="@+id/view5"
+                        diagonal:layout_constraintHorizontal_bias="0.5"
+                        diagonal:layout_constraintStart_toEndOf="@+id/view4"
+                        diagonal:layout_constraintTop_toTopOf="@+id/view4" />
+
+                    <TextView
+                        android:id="@+id/tvFolloing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="232"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_16font_mdp"
+                        diagonal:layout_constraintEnd_toEndOf="@+id/textView3"
+                        diagonal:layout_constraintStart_toStartOf="@+id/textView3"
+                        diagonal:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+                    <View
+                        android:id="@+id/view5"
+                        android:layout_width="1dp"
+                        android:layout_height="0dp"
+                        android:background="#A6A5A5"
+                        diagonal:layout_constraintBottom_toBottomOf="parent"
+                        diagonal:layout_constraintEnd_toStartOf="@+id/textView4"
+                        diagonal:layout_constraintHorizontal_bias="0.5"
+                        diagonal:layout_constraintStart_toEndOf="@+id/textView3"
+                        diagonal:layout_constraintTop_toTopOf="@+id/textView3" />
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Posts"
+                        android:textSize="@dimen/_14font_mdp"
+                        diagonal:layout_constraintEnd_toEndOf="parent"
+                        diagonal:layout_constraintHorizontal_bias="0.5"
+                        diagonal:layout_constraintStart_toEndOf="@+id/view5"
+                        diagonal:layout_constraintTop_toTopOf="@+id/view5" />
+
+                    <TextView
+                        android:id="@+id/tvPosts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="332"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_16font_mdp"
+                        diagonal:layout_constraintEnd_toEndOf="@+id/textView4"
+                        diagonal:layout_constraintStart_toStartOf="@+id/textView4"
+                        diagonal:layout_constraintTop_toBottomOf="@+id/textView4" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Bio -->
             <TextView
-                android:id="@+id/textViewNumberPhotos"
+                android:id="@+id/textViewBio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:text="Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development."
+                android:textSize="@dimen/_14font_mdp"
+                diagonal:layout_constraintEnd_toEndOf="@+id/cardView"
+                diagonal:layout_constraintStart_toStartOf="@+id/cardView"
+                diagonal:layout_constraintTop_toBottomOf="@+id/cardView" />
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#D1D1D1"
+                diagonal:layout_constraintEnd_toEndOf="parent"
+                diagonal:layout_constraintStart_toStartOf="parent"
+                diagonal:layout_constraintTop_toBottomOf="@+id/textViewBio" />
+            <TextView
+                android:id="@+id/tv55"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="332"
+                android:layout_marginTop="8dp"
+                android:text="Profile"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_16font_mdp"
-                diagonal:layout_constraintEnd_toEndOf="@+id/textView4"
-                diagonal:layout_constraintStart_toStartOf="@+id/textView4"
-                diagonal:layout_constraintTop_toBottomOf="@+id/textView4" />
+                android:textStyle="bold"
+                diagonal:layout_constraintStart_toStartOf="@+id/cardView"
+                diagonal:layout_constraintTop_toBottomOf="@+id/view" />
+
+            <TextView
+                android:id="@+id/tvLiveIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Lives in"
+                android:drawableStart="@drawable/baseline_house_24"
+                android:drawablePadding="5dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15font_mdp"
+                diagonal:layout_constraintStart_toStartOf="@+id/tv55"
+                diagonal:layout_constraintTop_toBottomOf="@+id/tv55" />
+
+            <TextView
+                android:id="@+id/liveIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Da Nang"
+                android:textSize="@dimen/_15font_mdp"
+                android:layout_marginStart="5dp"
+                diagonal:layout_constraintBottom_toBottomOf="@+id/tvLiveIn"
+                diagonal:layout_constraintStart_toEndOf="@+id/tvLiveIn"
+                diagonal:layout_constraintTop_toTopOf="@+id/tvLiveIn" />
+
+            <TextView
+                android:id="@+id/tvWorkAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Works at"
+                android:drawableStart="@drawable/baseline_business_center_24"
+                android:drawablePadding="5dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15font_mdp"
+                diagonal:layout_constraintStart_toStartOf="@+id/tvLiveIn"
+                diagonal:layout_constraintTop_toBottomOf="@+id/tvLiveIn" />
+
+            <TextView
+                android:id="@+id/workAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Da Nang"
+                android:textSize="@dimen/_15font_mdp"
+                android:layout_marginStart="5dp"
+                diagonal:layout_constraintBottom_toBottomOf="@+id/tvWorkAt"
+                diagonal:layout_constraintStart_toEndOf="@+id/tvWorkAt"
+                diagonal:layout_constraintTop_toTopOf="@+id/tvWorkAt" />
+
+            <View
+                android:id="@+id/view55"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="#D1D1D1"
+                diagonal:layout_constraintEnd_toEndOf="parent"
+                diagonal:layout_constraintStart_toStartOf="parent"
+                diagonal:layout_constraintTop_toBottomOf="@+id/tvWorkAt" />
+
+            <TextView
+                android:id="@+id/tvPostBy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="My posts"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16font_mdp"
+                android:textStyle="bold"
+                diagonal:layout_constraintStart_toStartOf="@+id/tv55"
+                diagonal:layout_constraintTop_toBottomOf="@+id/view55" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/postRv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                diagonal:layout_constraintEnd_toEndOf="parent"
+                diagonal:layout_constraintStart_toStartOf="parent"
+                diagonal:layout_constraintTop_toBottomOf="@+id/tvPostBy" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-
-    <TextView
-        android:id="@+id/textViewBio"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:text="Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development."
-        android:textSize="@dimen/_14font_mdp"
-        diagonal:layout_constraintEnd_toEndOf="@+id/cardView"
-        diagonal:layout_constraintStart_toStartOf="@+id/cardView"
-        diagonal:layout_constraintTop_toBottomOf="@+id/cardView" />
-
-    <TextView
-        android:id="@+id/textView11"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/acme"
-        android:text="My friends"
-        android:textSize="@dimen/_14font_mdp"
-        android:textColor="@color/black"
-        diagonal:layout_constraintStart_toStartOf="@+id/textViewBio"
-        diagonal:layout_constraintTop_toBottomOf="@+id/textViewBio" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/friendRV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        diagonal:layout_constraintEnd_toEndOf="parent"
-        diagonal:layout_constraintStart_toStartOf="parent"
-        diagonal:layout_constraintTop_toBottomOf="@+id/textView11" />
-
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

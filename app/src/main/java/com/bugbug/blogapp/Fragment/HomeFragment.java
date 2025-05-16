@@ -21,9 +21,12 @@ import com.bugbug.blogapp.Adapter.PostAdapter;
 import com.bugbug.blogapp.Adapter.StoryAdapter;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.Story;
+import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.Model.UserStories;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.Util.CloudinaryUtil;
+import com.bugbug.blogapp.databinding.FragmentHomeBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,14 +34,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 
 public class HomeFragment extends Fragment {
+    FragmentHomeBinding binding;
 
-    RecyclerView storyRecyclerView, dasboardRecyclerView;
     ArrayList<Story> storyList;
     ArrayList<Post> postList;
     FirebaseDatabase database;
@@ -73,6 +77,8 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        binding=FragmentHomeBinding.inflate(inflater, container, false);
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         loadingOverlay = view.findViewById(R.id.loadingOverlay);
 
@@ -85,17 +91,40 @@ public class HomeFragment extends Fragment {
         dialog.setMessage("Please wait...");
         dialog.setCancelable(false);
 
-
-        storyRecyclerView = view.findViewById(R.id.storyRV);
         storyList = new ArrayList<>();
         StoryAdapter storyAdapter = new StoryAdapter(storyList, getContext(), () -> {
             galleryLauncher.launch("image/*");
         });
+        database.getReference().child("Users")
+                .child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        String coverPhoto = user.getCoverPhoto();
+                        if (coverPhoto == null || coverPhoto.isEmpty()) {
+                            binding.profileImage.setImageResource(R.drawable.avatar_default);
+                        } else {
+                            Picasso.get()
+                                    .load(coverPhoto)
+                                    .placeholder(R.drawable.avatar_default)
+                                    .into(binding.profileImage);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+        binding.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomNavigationView bottomNav=requireActivity().findViewById(R.id.bottom_navigation);
+                bottomNav.setSelectedItemId(R.id.nav_profile);
+            }
+        });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        storyRecyclerView.setLayoutManager(linearLayoutManager);
-        storyRecyclerView.setNestedScrollingEnabled(false);
-        storyRecyclerView.setAdapter(storyAdapter);
+        binding.storyRV.setLayoutManager(linearLayoutManager);
+        binding.storyRV.setNestedScrollingEnabled(false);
+        binding.storyRV.setAdapter(storyAdapter);
         // Thêm item "Create a Story"
         storyList.add(new Story(R.drawable.im1));
         // Thêm các story khác
@@ -127,13 +156,12 @@ public class HomeFragment extends Fragment {
         });
 
 
-        dasboardRecyclerView = view.findViewById(R.id.dashboardRV);
         postList = new ArrayList<>();
         PostAdapter postAdapter = new PostAdapter(postList, getContext());
         LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getContext());
-        dasboardRecyclerView.setLayoutManager(linearLayoutManager1);
-        dasboardRecyclerView.setNestedScrollingEnabled(false);
-        dasboardRecyclerView.setAdapter(postAdapter);
+        binding.dashboardRV.setLayoutManager(linearLayoutManager1);
+        binding.dashboardRV.setNestedScrollingEnabled(false);
+        binding.dashboardRV.setAdapter(postAdapter);
 
         showLoadingOverlay();
         database.getReference().child("Posts").addListenerForSingleValueEvent(new ValueEventListener(){
@@ -182,7 +210,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        return view;
+        return binding.getRoot();
     }
 
     private void fetchSharedPost(String postId, String sharedBy) {
@@ -194,7 +222,7 @@ public class HomeFragment extends Fragment {
                     post.setShared(true);
                     post.setSharedBy(sharedBy);
                     postList.add(post);
-                    dasboardRecyclerView.getAdapter().notifyDataSetChanged();
+                    binding.dashboardRV.getAdapter().notifyDataSetChanged();
                 }
             }
 

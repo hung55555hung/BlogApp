@@ -56,7 +56,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         Uri uri = imageUris.get(position);
         holder.imageView.setImageURI(uri);
 
-        holder.removeButton.setOnClickListener(v -> removeListener.onImageRemove(position));
+        holder.removeButton.setOnClickListener(v -> {
+            int currentPosition = holder.getBindingAdapterPosition();
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                removeListener.onImageRemove(currentPosition);
+            }
+        });
     }
 
     @Override

@@ -21,7 +21,7 @@ public class PostImageAdapter extends RecyclerView.Adapter<PostImageAdapter.View
     private Context context;
     private List<String> imageUrls;
     private boolean isSingleImage;
-    private static final int MULTIPLE_IMAGE_WIDTH_DP = 200;
+    private static final int MAX_HEIGHT_DP = 200;
 
     public PostImageAdapter(Context context, List<String> imageUrls) {
         this.context = context;
@@ -55,13 +55,14 @@ public class PostImageAdapter extends RecyclerView.Adapter<PostImageAdapter.View
 
         if (isSingleImage) {
             imageParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            imageParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            holder.imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            holder.imageView.setMaxHeight((int) (400 * density));
+            holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             //holder.imageView.setMaxHeight((int) (MAX_HEIGHT_DP * density));
         } else {
-            imageParams.width =  (int) (MULTIPLE_IMAGE_WIDTH_DP * density);
-            imageParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            holder.imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imageParams.width =  ViewGroup.LayoutParams.WRAP_CONTENT;
+            holder.imageView.setMaxWidth((int) (300 * density));
+            holder.imageView.setMaxHeight((int) (MAX_HEIGHT_DP * density));
+            holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
         holder.imageView.setLayoutParams(imageParams);
         holder.imageView.setOnClickListener(v -> {
