@@ -46,6 +46,7 @@ public class CommentActivity extends AppCompatActivity {
 
         initialize();
         loadPostDetails();
+        loadPostedByUser();
         bindCommentCount();
         bindLikeState();
         setupCommentRecyclerView();
@@ -59,6 +60,7 @@ public class CommentActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         postId = intent.getStringExtra("postId");
+        postedBy = intent.getStringExtra("postedBy");
 
         binding.btnReturn.setOnClickListener(v->{finish();});
     }
