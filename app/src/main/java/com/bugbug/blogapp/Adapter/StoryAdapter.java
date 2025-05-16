@@ -74,6 +74,9 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             createHolder.textView.setText("Create a Story");
         } else {
             StoryViewHolder storyHolder = (StoryViewHolder) holder;
+            if(story.getStories() == null || story.getStories().isEmpty()){
+                return;
+            }
             UserStories latestStory = story.getStories().get(story.getStories().size() - 1);
             Picasso.get()
                     .load(latestStory.getImage())

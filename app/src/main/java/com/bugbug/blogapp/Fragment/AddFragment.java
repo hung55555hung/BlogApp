@@ -1,6 +1,7 @@
 package com.bugbug.blogapp.Fragment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,6 +52,7 @@ public class AddFragment extends Fragment {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    ProgressDialog dialog;
 
     public AddFragment() {
     }
@@ -58,6 +60,12 @@ public class AddFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dialog = new ProgressDialog(requireContext());
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setTitle("Post Uploading");
+        dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
 
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -154,6 +162,7 @@ public class AddFragment extends Fragment {
     }
 
     private void uploadPost() {
+        dialog.show();
         String userId = currentUser.getUid();
         String postDescription = binding.postDescription.getText().toString();
         long postedAt = new Date().getTime();
@@ -173,6 +182,7 @@ public class AddFragment extends Fragment {
                 public void onSuccess(List<String> imageUrls) {
                     post.setPostImages(new ArrayList<>(imageUrls));
                     savePost(post, postId);
+                    dialog.dismiss();
                 }
 
                 @Override
@@ -180,6 +190,7 @@ public class AddFragment extends Fragment {
                     if (isAdded()) {
                         Toast.makeText(requireContext(), "Upload failed for image " + (failedIndex + 1) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         bottomNav.setVisibility(View.VISIBLE);
+                        dialog.dismiss();
                     }
                 }
             });
@@ -200,11 +211,13 @@ public class AddFragment extends Fragment {
                         Toast.makeText(requireContext(), "Posting successfully", Toast.LENGTH_SHORT).show();
                     }
                     bottomNav.setSelectedItemId(R.id.nav_home);
+                    dialog.dismiss();
                 })
                 .addOnFailureListener(e -> {
                     if (isAdded()) {
                         Toast.makeText(requireContext(), "Post failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                    dialog.dismiss();
                 });
     }
 

@@ -1,7 +1,6 @@
 package com.bugbug.blogapp.Fragment;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -53,6 +52,7 @@ public class HomeFragment extends Fragment {
     ActivityResultLauncher<String> galleryLauncher;
     ProgressDialog dialog;
     String sharedBy;
+    private View loadingOverlay;
 
     public HomeFragment() {
 
@@ -78,6 +78,9 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding=FragmentHomeBinding.inflate(inflater, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        loadingOverlay = view.findViewById(R.id.loadingOverlay);
 
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -141,7 +144,6 @@ public class HomeFragment extends Fragment {
                             stories.add(userStory);
                         }
                         story.setStories(stories);
-
                         storyList.add(story);
                     }
                     storyAdapter.notifyDataSetChanged();
@@ -161,6 +163,7 @@ public class HomeFragment extends Fragment {
         binding.dashboardRV.setNestedScrollingEnabled(false);
         binding.dashboardRV.setAdapter(postAdapter);
 
+        showLoadingOverlay();
         database.getReference().child("Posts").addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -171,32 +174,39 @@ public class HomeFragment extends Fragment {
                     postList.add(post);
                 }
                 postAdapter.notifyDataSetChanged();
+                hideLoadingOverlay();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+                hideLoadingOverlay();
+            }
 
         });
 
         // Lấy danh sách bài post được chia sẻ từ UserShares
         String currentUserId = auth.getCurrentUser().getUid();
         sharedBy = currentUserId;
-        database.getReference().child("UserShares").addValueEventListener(new ValueEventListener() {
+        showLoadingOverlay();
+        database.getReference().child("UserShares").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot userid : snapshot.getChildren()) {
                         for (DataSnapshot postId : userid.getChildren()) {
                             String postIdValue = postId.getKey();
-                                fetchSharedPost(postIdValue, userid.getKey());
+                            fetchSharedPost(postIdValue, userid.getKey());
                         }
                     }
+                    postAdapter.notifyDataSetChanged();
+                    hideLoadingOverlay();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getContext(), "Error loading shared posts: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoadingOverlay();
             }
         });
 
@@ -255,6 +265,17 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void showLoadingOverlay() {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideLoadingOverlay() {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(View.GONE);
+        }
     }
 
 }
