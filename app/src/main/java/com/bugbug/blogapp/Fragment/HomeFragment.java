@@ -48,6 +48,7 @@ public class HomeFragment extends Fragment {
     ActivityResultLauncher<String> galleryLauncher;
     ProgressDialog dialog;
     String sharedBy;
+    private View loadingOverlay;
 
     public HomeFragment() {
 
@@ -73,6 +74,8 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        loadingOverlay = view.findViewById(R.id.loadingOverlay);
+
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -132,6 +135,7 @@ public class HomeFragment extends Fragment {
         dasboardRecyclerView.setNestedScrollingEnabled(false);
         dasboardRecyclerView.setAdapter(postAdapter);
 
+        showLoadingOverlay();
         database.getReference().child("Posts").addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -142,16 +146,20 @@ public class HomeFragment extends Fragment {
                     postList.add(post);
                 }
                 postAdapter.notifyDataSetChanged();
+                hideLoadingOverlay();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+                hideLoadingOverlay();
+            }
 
         });
 
         // Lấy danh sách bài post được chia sẻ từ UserShares
         String currentUserId = auth.getCurrentUser().getUid();
         sharedBy = currentUserId;
+        showLoadingOverlay();
         database.getReference().child("UserShares").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -163,12 +171,14 @@ public class HomeFragment extends Fragment {
                         }
                     }
                     postAdapter.notifyDataSetChanged();
+                    hideLoadingOverlay();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getContext(), "Error loading shared posts: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoadingOverlay();
             }
         });
 
@@ -227,6 +237,17 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void showLoadingOverlay() {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideLoadingOverlay() {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(View.GONE);
+        }
     }
 
 }
