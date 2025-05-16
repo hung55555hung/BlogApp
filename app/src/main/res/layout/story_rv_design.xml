@@ -25,7 +25,7 @@
         android:layout_height="30dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:src="@drawable/avt"
+        android:src="@drawable/avatar_default"
         app:civ_border_color="#F4450B"
         app:civ_border_overlay="false"
         app:civ_border_width="1dp"

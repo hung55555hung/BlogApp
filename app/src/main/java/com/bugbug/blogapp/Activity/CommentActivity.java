@@ -19,6 +19,7 @@ import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityCommentBinding;
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -84,7 +85,8 @@ public class CommentActivity extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
 
                         binding.postDescription.setText(post.getPostDescription());
-
+                        String time = TimeAgo.using(post.getPostedAt());
+                        binding.time.setText(time);
                     }
 
                     @Override
@@ -113,7 +115,6 @@ public class CommentActivity extends AppCompatActivity {
                         }
 
                         binding.userName.setText(name);
-                        binding.professionTv.setText(profession);
                     }
 
                     @Override
