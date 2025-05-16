@@ -20,6 +20,7 @@ import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.DasboardRvSampleBinding;
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -72,6 +73,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public void bind(Post post) {
             loadPostImage(post);
             binding.postDescription.setText(post.getPostDescription());
+            String time = TimeAgo.using(post.getPostedAt());
+            binding.bio.setText(time);
             binding.comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -135,7 +138,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             binding.profileImage.setImageResource(R.drawable.avatar_default);
                         }
                         binding.userName.setText(user.getName());
-                        binding.bio.setText(user.getProfession());
                     }
                 }
 
