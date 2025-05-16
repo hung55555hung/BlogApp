@@ -1,29 +1,22 @@
 package com.bugbug.blogapp.Fragment;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import com.bugbug.blogapp.Activity.LoginActivity;
-import com.bugbug.blogapp.Adapter.FollowAdapter;
 import com.bugbug.blogapp.Adapter.PostAdapter;
-import com.bugbug.blogapp.Model.Follow;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
-import com.bugbug.blogapp.databinding.FragmentAddBinding;
 import com.bugbug.blogapp.databinding.FragmentProfileBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +28,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
     FragmentProfileBinding binding;
@@ -86,7 +78,7 @@ public class ProfileFragment extends Fragment {
                         } else {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avt)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.profileImage);
                         }
                     }
@@ -137,6 +129,7 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     Post post = snapshot.getValue(Post.class);
+                                    post.setPostId(dataSnapshot.getKey());
                                     postList.add(post);
                                     postAdapter.notifyDataSetChanged();
                                 }
@@ -150,7 +143,7 @@ public class ProfileFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        binding.imageViewSetting.setOnClickListener(v -> showSettingDialog());
+        binding.imageViewSetting.setOnClickListener(v -> showSettingDialog(v));
 
         return binding.getRoot();
     }
@@ -162,7 +155,6 @@ public class ProfileFragment extends Fragment {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 true);
 
-        // Click handlers
         popupView.findViewById(R.id.editProfile).setOnClickListener(v -> {
             popupWindow.dismiss();
             getParentFragmentManager().beginTransaction()
@@ -189,7 +181,7 @@ public class ProfileFragment extends Fragment {
 
 
         popupWindow.setElevation(10);
-        popupWindow.showAsDropDown(anchorView, -476, -50); // chỉnh vị trí menu
+        popupWindow.showAsDropDown(anchorView, -476, -50);
     }
 
 

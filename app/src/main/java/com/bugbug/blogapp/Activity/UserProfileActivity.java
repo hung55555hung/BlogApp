@@ -80,7 +80,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         } else {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avt)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.avatarImg);
                         }
                     }
@@ -207,12 +207,12 @@ public class UserProfileActivity extends AppCompatActivity {
         if ( coverPhoto == null ||  coverPhoto.isEmpty()) {
             Picasso.get()
                     .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
-                    .placeholder(R.drawable.avt)
+                    .placeholder(R.drawable.avatar_default)
                     .into(binding.profileImage);
         } else {
             Picasso.get()
                     .load(coverPhoto)
-                    .placeholder(R.drawable.avt)
+                    .placeholder(R.drawable.avatar_default)
                     .into(binding.profileImage);
         }
         binding.titleText.setText("Unfollow "+user.getName()+"?");

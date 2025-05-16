@@ -109,7 +109,7 @@ public class AddFragment extends Fragment {
                         } else {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avt)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.profileImage);
                         }
                     }
@@ -230,6 +230,5 @@ public class AddFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        CloudinaryUtil.shutdown();
     }
 }

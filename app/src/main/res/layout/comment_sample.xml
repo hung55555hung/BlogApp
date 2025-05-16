@@ -9,7 +9,7 @@
         android:id="@+id/profile_image"
         android:layout_width="@dimen/_36mdp"
         android:layout_height="@dimen/_36mdp"
-        android:src="@drawable/avt"
+        android:src="@drawable/avatar_default"
         app:civ_border_width="2dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

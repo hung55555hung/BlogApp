@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popupLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup_background"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:elevation="8dp">
+
+    <TextView
+        android:id="@+id/editPost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Edit Post"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_edit_profile_image"
+        android:drawablePadding="8dp" />
+
+    <TextView
+        android:id="@+id/moveTrash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Move to trash"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/baseline_restore_from_trash_24"
+        android:drawablePadding="8dp" />
+
+</LinearLayout>

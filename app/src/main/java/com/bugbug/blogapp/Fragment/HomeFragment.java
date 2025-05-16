@@ -27,6 +27,7 @@ import com.bugbug.blogapp.Model.UserStories;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.Util.CloudinaryUtil;
 import com.bugbug.blogapp.databinding.FragmentHomeBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -102,13 +103,20 @@ public class HomeFragment extends Fragment {
                         } else {
                             Picasso.get()
                                     .load(coverPhoto)
-                                    .placeholder(R.drawable.avt)
+                                    .placeholder(R.drawable.avatar_default)
                                     .into(binding.profileImage);
                         }
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
+        binding.profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomNavigationView bottomNav=requireActivity().findViewById(R.id.bottom_navigation);
+                bottomNav.setSelectedItemId(R.id.nav_profile);
+            }
+        });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.storyRV.setLayoutManager(linearLayoutManager);

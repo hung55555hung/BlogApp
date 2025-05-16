@@ -1,5 +1,8 @@
 package com.bugbug.blogapp.Adapter;
 
+import static androidx.core.content.ContextCompat.startActivity;
+import static java.security.AccessController.getContext;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,10 +18,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bugbug.blogapp.Activity.CommentActivity;
+import com.bugbug.blogapp.Activity.LoginActivity;
+import com.bugbug.blogapp.Fragment.ChangePasswordFragment;
+import com.bugbug.blogapp.Fragment.EditProfileFragment;
 import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
+import com.bugbug.blogapp.Util.CloudinaryUtil;
 import com.bugbug.blogapp.databinding.DasboardRvSampleBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
@@ -105,10 +114,70 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }else {
                 bindUserInfo(post.getPostedBy());
             }
+            binding.menu.setOnClickListener(v -> showPostOption(v,post));
             bindLikeState(post);
             bindCommentCount(post.getPostId());
             bindShareState(post);
         }
+        private void showPostOption(View v,Post post){
+            View popupView = LayoutInflater.from(this.itemView.getContext()).inflate(R.layout.popup_post_option, null);
+
+            PopupWindow popupWindow = new PopupWindow(popupView,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    true);
+
+            popupView.findViewById(R.id.editPost).setOnClickListener(vi->popupWindow.dismiss());
+
+            popupView.findViewById(R.id.moveTrash).setOnClickListener(vi -> {
+                removePost(post);
+                popupWindow.dismiss();
+            });
+            popupWindow.setElevation(10);
+            popupWindow.showAsDropDown(v, -476, -50);
+        }
+        private void removePost(Post post){
+            List<String> imageUrls = post.getPostImages();
+            if (imageUrls != null && !imageUrls.isEmpty()) {
+                CloudinaryUtil.deleteImages(imageUrls, new CloudinaryUtil.DeleteImagesResultListener() {
+                    @Override
+                    public void onSuccess() {
+                        deletePostFromDatabase(post);
+                    }
+
+                    @Override
+                    public void onFailure(List<Exception> errors) {
+                        Toast.makeText(context, "Some images failed to delete", Toast.LENGTH_SHORT).show();
+                        deletePostFromDatabase(post);
+                    }
+                });
+            } else {
+                deletePostFromDatabase(post);
+            }
+        }
+        private void deletePostFromDatabase(Post post) {
+            int currentPosition = getBindingAdapterPosition();
+            if (currentPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+            DatabaseReference postRef = FirebaseDatabase.getInstance()
+                    .getReference("Posts")
+                    .child(post.getPostId());
+            postRef.removeValue().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    postList.remove(currentPosition);
+                    notifyItemRemoved(currentPosition);
+                    FirebaseDatabase.getInstance()
+                            .getReference("UserPosts")
+                            .child(currentUserId)
+                            .child(post.getPostId()).removeValue();
+                    Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
 
         private void loadPostImage(Post post) {
             if(post.getPostImages()==null|| post.getPostImages().isEmpty()){

@@ -60,7 +60,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         } else {
             Picasso.get()
                     .load(coverPhoto)
-                    .placeholder(R.drawable.avt)
+                    .placeholder(R.drawable.avatar_default)
                     .into(holder.binding.profileImage);
         }
         holder.binding.name.setText(user.getName());
@@ -150,7 +150,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         } else {
             Picasso.get()
                     .load(coverPhoto)
-                    .placeholder(R.drawable.avt)
+                    .placeholder(R.drawable.avatar_default)
                     .into(binding.profileImage);
         }
         binding.titleText.setText("Unfollow "+user.getName()+"?");

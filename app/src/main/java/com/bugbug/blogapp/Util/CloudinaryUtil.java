@@ -149,14 +149,41 @@ public class CloudinaryUtil {
             }
         }
     }
-    public static void shutdown() {
-        if (!executorService.isShutdown()) {
-            executorService.shutdown();
-            Log.d(TAG, "ExecutorService shut down");
+    public static void deleteImages(List<String> imageUrls, DeleteImagesResultListener listener) {
+        List<Exception> exceptions = new ArrayList<>();
+        final int total = imageUrls.size();
+        final int[] completed = {0};
+
+        for (String url : imageUrls) {
+            deleteImage(url, new DeleteImageResultListener() {
+                @Override
+                public void onSuccess() {
+                    checkDone();
+                }
+                @Override
+                public void onFailure(Exception e) {
+                    exceptions.add(e);
+                    checkDone();
+                }
+                private synchronized void checkDone() {
+                    completed[0]++;
+                    if (completed[0] == total) {
+                        if (exceptions.isEmpty()) {
+                            listener.onSuccess();
+                        } else {
+                            listener.onFailure(exceptions);
+                        }
+                    }
+                }
+            });
         }
     }
 
-    // Listener for single user image upload
+    public interface DeleteImagesResultListener {
+        void onSuccess();
+        void onFailure(List<Exception> errors);
+    }
+
     public interface UploadImageResultListener {
         void onSuccess(String imageUrl);
         void onFailure(Exception e);
