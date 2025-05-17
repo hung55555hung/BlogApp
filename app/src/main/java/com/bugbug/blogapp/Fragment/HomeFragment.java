@@ -37,6 +37,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 
@@ -46,12 +47,9 @@ public class HomeFragment extends Fragment {
     ArrayList<Story> storyList;
     ArrayList<Post> postList;
     FirebaseDatabase database;
-    FirebaseStorage storage;
     FirebaseAuth auth;
-    ShapeableImageView addStory;
     ActivityResultLauncher<String> galleryLauncher;
     ProgressDialog dialog;
-    String sharedBy;
     private View loadingOverlay;
 
     public HomeFragment() {
@@ -84,7 +82,6 @@ public class HomeFragment extends Fragment {
 
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
-        storage = FirebaseStorage.getInstance();
 
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setTitle("Story Uploading");
@@ -173,6 +170,7 @@ public class HomeFragment extends Fragment {
                     post.setPostId(dataSnapshot.getKey());
                     postList.add(post);
                 }
+                Collections.shuffle(postList);
                 postAdapter.notifyDataSetChanged();
                 hideLoadingOverlay();
             }
@@ -183,54 +181,7 @@ public class HomeFragment extends Fragment {
             }
 
         });
-
-        // Lấy danh sách bài post được chia sẻ từ UserShares
-        String currentUserId = auth.getCurrentUser().getUid();
-        sharedBy = currentUserId;
-        showLoadingOverlay();
-        database.getReference().child("UserShares").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot userid : snapshot.getChildren()) {
-                        for (DataSnapshot postId : userid.getChildren()) {
-                            String postIdValue = postId.getKey();
-                            fetchSharedPost(postIdValue, userid.getKey());
-                        }
-                    }
-                    postAdapter.notifyDataSetChanged();
-                    hideLoadingOverlay();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Error loading shared posts: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                hideLoadingOverlay();
-            }
-        });
-
         return binding.getRoot();
-    }
-
-    private void fetchSharedPost(String postId, String sharedBy) {
-        database.getReference().child("Posts").child(postId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Post post = snapshot.getValue(Post.class);
-                if (post != null) {
-                    post.setShared(true);
-                    post.setSharedBy(sharedBy);
-                    postList.add(post);
-                    binding.dashboardRV.getAdapter().notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("HomeFragment", "Error fetching shared post: " + error.getMessage());
-            }
-        });
     }
 
     private void uploadImageToFirebase(Uri uri) {

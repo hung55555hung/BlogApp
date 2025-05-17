@@ -1,9 +1,11 @@
 package com.bugbug.blogapp.Adapter;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
 import static androidx.core.content.ContextCompat.startActivity;
 import static java.security.AccessController.getContext;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +26,7 @@ import com.bugbug.blogapp.Activity.CommentActivity;
 import com.bugbug.blogapp.Activity.LoginActivity;
 import com.bugbug.blogapp.Fragment.ChangePasswordFragment;
 import com.bugbug.blogapp.Fragment.EditProfileFragment;
+import com.bugbug.blogapp.Fragment.UpdateFragment;
 import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
@@ -133,7 +137,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     true);
 
-            popupView.findViewById(R.id.editPost).setOnClickListener(vi->popupWindow.dismiss());
+            popupView.findViewById(R.id.editPost).setOnClickListener(vi->{
+                ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, UpdateFragment.newInstance(post))
+                        .addToBackStack(null)
+                        .commit();
+                popupWindow.dismiss();
+            });
 
             popupView.findViewById(R.id.moveTrash).setOnClickListener(vi -> {
                 removePost(post);
@@ -325,7 +335,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     .child(post.getPostId())
                     .child("shares");
 
-            sharesRef.addValueEventListener(new ValueEventListener() {
+            sharesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     long shareCount = snapshot.getChildrenCount();
@@ -339,8 +349,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             });
 
             binding.share.setOnClickListener(view -> {
-                sharePost(post);
+                new AlertDialog.Builder(context)
+                        .setTitle("Share Post")
+                        .setMessage("Are you sure you want to share this post?")
+                        .setPositiveButton("Share", (dialog, which) -> {
+                            sharePost(post);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             });
+
         }
 
         private void sharePost(Post post) {

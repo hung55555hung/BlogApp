@@ -69,7 +69,6 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Story story = storyList.get(position);
         if (holder instanceof CreateStoryViewHolder) {
             CreateStoryViewHolder createHolder = (CreateStoryViewHolder) holder;
-            createHolder.storyImage.setImageResource(story.getStory());
             createHolder.addIcon.setVisibility(View.VISIBLE);
             createHolder.textView.setText("Create a Story");
         } else {
@@ -88,15 +87,13 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             User user = snapshot.getValue(User.class);
-                            if(user.getCoverPhoto() != null && !user.getCoverPhoto().isEmpty()) {
-                                Picasso.get()
-                                        .load(user.getCoverPhoto())
-                                        .placeholder(R.drawable.placeholder)
-                                        .into(storyHolder.binding.profileImage);
+                            String coverPhoto=user.getCoverPhoto();
+                            if (coverPhoto == null || coverPhoto.isEmpty()) {
+                                storyHolder.binding.profileImage.setImageResource(R.drawable.avatar_default);
                             } else {
                                 Picasso.get()
-                                        .load("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg")
-                                        .placeholder(R.drawable.placeholder)
+                                        .load(coverPhoto)
+                                        .placeholder(R.drawable.avatar_default)
                                         .into(storyHolder.binding.profileImage);
                             }
                             storyHolder.binding.name.setText(user.getName());
