@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bugbug.blogapp.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -54,7 +55,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         holder.itemView.setLayoutParams(constraintLayoutParams);
         holder.imageView.setLayoutParams(params);
         Uri uri = imageUris.get(position);
-        holder.imageView.setImageURI(uri);
+        Picasso.get()
+                .load(uri.toString())
+                .placeholder(R.drawable.avatar_default)
+                .error(R.drawable.avatar_default)
+                .into(holder.imageView);
 
         holder.removeButton.setOnClickListener(v -> {
             int currentPosition = holder.getBindingAdapterPosition();

@@ -1,9 +1,10 @@
 package com.bugbug.blogapp.Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Post {
+public class Post implements Serializable {
     private String postId;
     private ArrayList<String> postImages;
     private String postedBy;

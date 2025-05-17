@@ -59,6 +59,11 @@ public class CloudinaryUtil {
         }
 
         Uri imageUri = imageUris.get(index);
+        if (imageUri.toString().startsWith("http")) {
+            imageUrls.add(imageUri.toString());
+            uploadNextPostImage(context, imageUris, index + 1, imageUrls, listener);
+            return;
+        }
         executorService.execute(() -> {
             File tempFile = null;
             try {

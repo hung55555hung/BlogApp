@@ -16,6 +16,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,7 @@ import com.bugbug.blogapp.Activity.CommentActivity;
 import com.bugbug.blogapp.Activity.LoginActivity;
 import com.bugbug.blogapp.Fragment.ChangePasswordFragment;
 import com.bugbug.blogapp.Fragment.EditProfileFragment;
+import com.bugbug.blogapp.Fragment.UpdateFragment;
 import com.bugbug.blogapp.Model.Notification;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
@@ -133,7 +135,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     true);
 
-            popupView.findViewById(R.id.editPost).setOnClickListener(vi->popupWindow.dismiss());
+            popupView.findViewById(R.id.editPost).setOnClickListener(vi->{
+                ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, UpdateFragment.newInstance(post))
+                        .addToBackStack(null)
+                        .commit();
+                popupWindow.dismiss();
+            });
 
             popupView.findViewById(R.id.moveTrash).setOnClickListener(vi -> {
                 removePost(post);
