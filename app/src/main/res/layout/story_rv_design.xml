@@ -26,23 +26,11 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:src="@drawable/avatar_default"
-        app:civ_border_color="#F4450B"
         app:civ_border_overlay="false"
         app:civ_border_width="1dp"
         app:layout_constraintStart_toStartOf="@+id/story"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-
-    <ImageView
-        android:id="@+id/storyType"
-        android:layout_width="30dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="@+id/story"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_live" />
 
     <TextView
         android:id="@+id/name"
@@ -51,7 +39,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginBottom="8dp"
         android:text="MR.Hung"
-        android:textColor="@color/white"
+        android:textColor="#C0C0C0"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/story"
         app:layout_constraintStart_toStartOf="parent" />

@@ -1,9 +1,11 @@
 package com.bugbug.blogapp.Adapter;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
 import static androidx.core.content.ContextCompat.startActivity;
 import static java.security.AccessController.getContext;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -333,7 +335,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     .child(post.getPostId())
                     .child("shares");
 
-            sharesRef.addValueEventListener(new ValueEventListener() {
+            sharesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     long shareCount = snapshot.getChildrenCount();
@@ -347,8 +349,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             });
 
             binding.share.setOnClickListener(view -> {
-                sharePost(post);
+                new AlertDialog.Builder(context)
+                        .setTitle("Share Post")
+                        .setMessage("Are you sure you want to share this post?")
+                        .setPositiveButton("Share", (dialog, which) -> {
+                            sharePost(post);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             });
+
         }
 
         private void sharePost(Post post) {

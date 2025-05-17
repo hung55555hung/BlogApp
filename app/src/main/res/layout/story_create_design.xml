@@ -11,7 +11,7 @@
         android:layout_height="80dp"
         android:layout_marginEnd="16dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/im1"
+        android:src="@drawable/create_story"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:shapeAppearanceOverlay="@style/AppTheme"
