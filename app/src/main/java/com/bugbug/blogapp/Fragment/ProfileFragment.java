@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +15,12 @@ import android.widget.PopupWindow;
 
 import com.bugbug.blogapp.Activity.LoginActivity;
 import com.bugbug.blogapp.Adapter.PostAdapter;
+import com.bugbug.blogapp.Adapter.UserAdapter;
 import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.FragmentProfileBinding;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -96,6 +99,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+        binding.textViewFollower.setOnClickListener(v->handleClikFollower());
 
         //Load following
         database.getReference().child("Followings").child(auth.getUid())
@@ -108,6 +112,7 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
+        binding.textViewFollowing.setOnClickListener(v->handleClickFollowing());
 
         //Load post by user
         postList = new ArrayList<>();
@@ -182,6 +187,86 @@ public class ProfileFragment extends Fragment {
 
         popupWindow.setElevation(10);
         popupWindow.showAsDropDown(anchorView, -476, -50);
+    }
+    private void handleClikFollower(){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.bottom_sheet_list_user, null);
+        bottomSheetDialog.setContentView(dialogView);
+        ArrayList<User> list=new ArrayList<>();
+        UserAdapter userAdapter = new UserAdapter(list, getContext());
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerViewFl);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        recyclerView.setAdapter(userAdapter);
+        userRef.child("followers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String followerId = dataSnapshot.getKey();
+                        if (followerId != null) {
+                            FirebaseDatabase.getInstance().getReference().child("Users")
+                                    .child(followerId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                    User user = userSnapshot.getValue(User.class);
+                                    if (user != null) {
+                                        list.add(user);
+                                        userAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {}
+                            });
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+        bottomSheetDialog.show();
+    }
+    private void handleClickFollowing(){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.bottom_sheet_list_user, null);
+        bottomSheetDialog.setContentView(dialogView);
+        ArrayList<User> list=new ArrayList<>();
+        UserAdapter userAdapter = new UserAdapter(list, getContext());
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerViewFl);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        recyclerView.setAdapter(userAdapter);
+        FirebaseDatabase.getInstance().getReference().child("Followings")
+                .child(auth.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String followerId = dataSnapshot.getKey();
+                        if (followerId != null) {
+                            FirebaseDatabase.getInstance().getReference().child("Users")
+                                    .child(followerId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                            User user = userSnapshot.getValue(User.class);
+                                            if (user != null) {
+                                                list.add(user);
+                                                userAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {}
+                                    });
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+        bottomSheetDialog.show();
     }
 
 

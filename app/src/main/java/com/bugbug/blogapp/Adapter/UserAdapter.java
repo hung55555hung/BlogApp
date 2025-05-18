@@ -65,26 +65,30 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
         holder.binding.name.setText(user.getName());
         holder.binding.profession.setText(user.getProfession());
-
-        FirebaseDatabase.getInstance().getReference().child("Users")
-                        .child(user.getUserID()).child("followers")
-                        .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            holder.binding.followBtn.setVisibility(View.GONE);
-                            holder.binding.followingBtn.setVisibility(View.VISIBLE);
-                            holder.binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user, holder));
-                        } else {
-                            holder.binding.followBtn.setVisibility(View.VISIBLE);
-                            holder.binding.followingBtn.setVisibility(View.GONE);
-                            holder.binding.followBtn.setOnClickListener(v -> handleFollow(user,holder));
+        if (user.getUserID().equals(currentUser.getUid())){
+            holder.binding.followBtn.setVisibility(View.GONE);
+            holder.binding.followingBtn.setVisibility(View.GONE);
+        }else{
+            FirebaseDatabase.getInstance().getReference().child("Users")
+                    .child(user.getUserID()).child("followers")
+                    .child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(snapshot.exists()){
+                                holder.binding.followBtn.setVisibility(View.GONE);
+                                holder.binding.followingBtn.setVisibility(View.VISIBLE);
+                                holder.binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user, holder));
+                            } else {
+                                holder.binding.followBtn.setVisibility(View.VISIBLE);
+                                holder.binding.followingBtn.setVisibility(View.GONE);
+                                holder.binding.followBtn.setOnClickListener(v -> handleFollow(user,holder));
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+        }
         holder.binding.userItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
