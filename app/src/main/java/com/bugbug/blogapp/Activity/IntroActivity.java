@@ -25,10 +25,12 @@ public class IntroActivity extends AppIntro {
 
         setTransformer(AppIntroPageTransformerType.Flow.INSTANCE);
         setColorTransitionsEnabled(false);
-        setWizardMode(true);
+        setWizardMode(false);
         setIndicatorEnabled(true);
         setSystemBackButtonLocked(true);
         setVibrate(true);
+        setColorSkipButton(getResources().getColor(R.color.black));
+        setColorDoneText(getResources().getColor(R.color.black));
     }
 
     @Override
