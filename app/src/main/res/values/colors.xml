@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">	#9E9E9E</color>
+    <color name="colorPrimary">#FFFFFF</color>        <!-- Nền chính: trắng -->
+    <color name="colorOnPrimary">#000000</color>
+
+    <color name="colorBackground">#FFFFFF</color>     <!-- Nền chung toàn app -->
+    <color name="colorOnBackground">#000000</color>
+    <color name="colorApp">#4C94F4</color>
+    <color name="colorNotification">#1A4C94F4</color>
 </resources>
