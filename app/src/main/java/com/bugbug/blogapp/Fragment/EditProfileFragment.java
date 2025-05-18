@@ -1,6 +1,7 @@
 package com.bugbug.blogapp.Fragment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ public class EditProfileFragment extends Fragment {
 
     private DatabaseReference userRef;
     private User user;
+    ProgressDialog dialog;
 
     public EditProfileFragment() {}
 
@@ -115,6 +117,12 @@ public class EditProfileFragment extends Fragment {
                 return;
             }
             if (uri != null) {
+                dialog = new ProgressDialog(requireContext());
+                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                dialog.setTitle("Updating");
+                dialog.setMessage("Please wait...");
+                dialog.setCancelable(false);
+                dialog.show();
                 CloudinaryUtil.uploadImage(requireContext(), uri, new CloudinaryUtil.UploadImageResultListener() {
                     @Override
                     public void onSuccess(String uploadedImageUrl) {
@@ -126,7 +134,9 @@ public class EditProfileFragment extends Fragment {
                                     updateUserProfile();
                                 }
                                 @Override
-                                public void onFailure(Exception e) {}
+                                public void onFailure(Exception e) {
+                                    updateUserProfile();
+                                }
                             });
                         }else{
                             user.setCoverPhoto(uploadedImageUrl);
@@ -156,13 +166,16 @@ public class EditProfileFragment extends Fragment {
 
         userRef.updateChildren(userUpdates)
                 .addOnSuccessListener(aVoid -> {
+                    dialog.dismiss();
                     Toast.makeText(this.getContext(), "Updated", Toast.LENGTH_SHORT).show();
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new ProfileFragment())
                             .addToBackStack(null)
                             .commit();
+
                 })
                 .addOnFailureListener(e -> {
+                    dialog.dismiss();
                     Toast.makeText(this.getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }

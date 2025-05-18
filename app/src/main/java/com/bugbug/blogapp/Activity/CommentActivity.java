@@ -60,7 +60,6 @@ public class CommentActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         postId = intent.getStringExtra("postId");
-        postedBy = intent.getStringExtra("postedBy");
 
         binding.btnReturn.setOnClickListener(v->{finish();});
     }

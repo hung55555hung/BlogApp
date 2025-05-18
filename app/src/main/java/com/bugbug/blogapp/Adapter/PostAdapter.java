@@ -248,7 +248,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     int realTimeLikeCount = (int) snapshot.getChildrenCount();
-                    binding.like.setText(realTimeLikeCount + "");
+                    binding.like.setText(realTimeLikeCount + " Likes");
 
                     boolean isLiked = snapshot.hasChild(currentUserId);
                     binding.like.setCompoundDrawablesWithIntrinsicBounds(
@@ -339,7 +339,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     long shareCount = snapshot.getChildrenCount();
-                    binding.share.setText(shareCount +" ");
+                    binding.share.setText(shareCount +" Shares");
                 }
 
                 @Override

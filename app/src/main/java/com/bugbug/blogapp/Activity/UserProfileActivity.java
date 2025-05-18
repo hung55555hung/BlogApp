@@ -191,6 +191,11 @@ public class UserProfileActivity extends AppCompatActivity {
                                                 .child(user.getUserID())
                                                 .push()
                                                 .setValue(notification);
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("Followings")
+                                                .child(currentUser.getUid())
+                                                .child(user.getUserID())
+                                                .setValue(true);
                                         binding.followBtn.setVisibility(View.GONE);
                                         binding.followingBtn.setVisibility(View.VISIBLE);
                                         binding.followingBtn.setOnClickListener(v -> showUnfollowBottomSheet(user));
@@ -258,6 +263,11 @@ public class UserProfileActivity extends AppCompatActivity {
                                             public void onCancelled(@NonNull DatabaseError databaseError) {
                                             }
                                         });
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("Followings")
+                                                .child(currentUser.getUid())
+                                                .child(user.getUserID())
+                                                .removeValue();
                                         binding.followBtn.setVisibility(View.VISIBLE);
                                         binding.followingBtn.setVisibility(View.GONE);
                                         binding.followBtn.setOnClickListener(v -> handleFollow(user));

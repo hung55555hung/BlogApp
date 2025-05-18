@@ -150,6 +150,36 @@ public class ProfileFragment extends Fragment {
 
         binding.imageViewSetting.setOnClickListener(v -> showSettingDialog(v));
 
+        String currentUserId = auth.getCurrentUser().getUid();
+        database.getReference().child("UserShares").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot postId : snapshot.getChildren()) {
+                        database.getReference().child("Posts")
+                                .child(postId.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                Post post = snapshot.getValue(Post.class);
+                                if (post != null) {
+                                    post.setShared(true);
+                                    post.setSharedBy(currentUserId);
+                                    postList.add(post);
+                                    postAdapter.notifyDataSetChanged();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
         return binding.getRoot();
     }
     private void showSettingDialog(View anchorView) {
