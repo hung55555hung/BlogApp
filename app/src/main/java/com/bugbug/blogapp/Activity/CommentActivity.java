@@ -1,11 +1,16 @@
 package com.bugbug.blogapp.Activity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -17,6 +22,7 @@ import com.bugbug.blogapp.Model.Post;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.ActivityCommentBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,12 +52,6 @@ public class CommentActivity extends AppCompatActivity {
 
         initialize();
         loadPostDetails();
-        loadPostedByUser();
-        bindCommentCount();
-        bindLikeState();
-        setupCommentRecyclerView();
-        loadComments();
-        setupPostCommentButton();
     }
 
     private void initialize() {
@@ -82,6 +82,12 @@ public class CommentActivity extends AppCompatActivity {
                         postedBy=post.getPostedBy();
                         binding.postDescription.setText(post.getPostDescription());
                         loadPostedByUser();
+                        bindCommentCount();
+                        bindLikeState();
+                        bindShareState();
+                        setupCommentRecyclerView();
+                        loadComments();
+                        setupPostCommentButton();
 
                     }
 
@@ -150,8 +156,6 @@ public class CommentActivity extends AppCompatActivity {
                                 .setValue(notification);
 
                         binding.commentEt.setText("");
-                        commentList.add(comment);
-                        commentAdapter.notifyDataSetChanged();
 
                         InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -185,19 +189,22 @@ public class CommentActivity extends AppCompatActivity {
         database.getReference()
                 .child("Comments")
                 .child(postId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .orderByChild("commentAt")
+                .addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        commentList.clear();
-
-                        for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
-                            Comment comment = commentSnapshot.getValue(Comment.class);
-                            if (comment == null) continue;
-                            comment.setCommentId(commentSnapshot.getKey());
+                    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                        Comment comment = snapshot.getValue(Comment.class);
+                        if (comment != null) {
+                            comment.setCommentId(snapshot.getKey());
                             fetchUserNameForComment(comment);
                         }
                     }
-
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
@@ -295,5 +302,57 @@ public class CommentActivity extends AppCompatActivity {
                     .push()
                     .setValue(notification);
         }
+    }
+    private void bindShareState() {
+        DatabaseReference sharesRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Posts")
+                .child(postId)
+                .child("shares");
+
+        sharesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long shareCount = snapshot.getChildrenCount();
+                binding.share.setText(shareCount +" Shares");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("PostAdapter", "Error fetching share count: " + error.getMessage());
+            }
+        });
+
+        binding.share.setOnClickListener(view -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Share Post")
+                    .setMessage("Are you sure you want to share this post?")
+                    .setPositiveButton("Share", (dialog, which) -> {
+                        sharePost();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+
+    }
+
+    private void sharePost() {
+        DatabaseReference userSharesRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("UserShares")
+                .child(auth.getUid())
+                .child(postId);
+
+        DatabaseReference postSharesRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Posts")
+                .child(postId)
+                .child("shares")
+                .child(auth.getUid());
+
+        userSharesRef.setValue(true)
+                .addOnSuccessListener(aVoid -> {
+                    postSharesRef.setValue(true);
+                });
     }
 }

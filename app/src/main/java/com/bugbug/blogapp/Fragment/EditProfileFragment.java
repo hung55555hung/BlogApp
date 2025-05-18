@@ -76,7 +76,6 @@ public class EditProfileFragment extends Fragment {
             if (snapshot.exists()) {
                 user=snapshot.getValue(User.class);
                 binding.editName.setText(user.getName());
-                binding.editBirthday.setText(user.getBirthday());
                 binding.editAddress.setText(user.getAddress());
                 binding.editProfession.setText(user.getProfession());
                 binding.editWorkAt.setText(user.getWorkAt());
@@ -116,17 +115,20 @@ public class EditProfileFragment extends Fragment {
                 Toast.makeText(requireContext(), "Name's user cannot empty!", Toast.LENGTH_SHORT).show();
                 return;
             }
+            dialog = new ProgressDialog(requireContext());
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setTitle("Updating");
+            dialog.setMessage("Please wait...");
+            dialog.setCancelable(false);
+            dialog.show();
             if (uri != null) {
-                dialog = new ProgressDialog(requireContext());
-                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                dialog.setTitle("Updating");
-                dialog.setMessage("Please wait...");
-                dialog.setCancelable(false);
-                dialog.show();
                 CloudinaryUtil.uploadImage(requireContext(), uri, new CloudinaryUtil.UploadImageResultListener() {
                     @Override
                     public void onSuccess(String uploadedImageUrl) {
-                        if(!user.getCoverPhoto().isEmpty()){
+                        if(user.getCoverPhoto()==null||user.getCoverPhoto().isEmpty()){
+                            user.setCoverPhoto(uploadedImageUrl);
+                            updateUserProfile();
+                        }else{
                             CloudinaryUtil.deleteImage(user.getCoverPhoto(),new CloudinaryUtil.DeleteImageResultListener(){
                                 @Override
                                 public void onSuccess() {
@@ -138,9 +140,6 @@ public class EditProfileFragment extends Fragment {
                                     updateUserProfile();
                                 }
                             });
-                        }else{
-                            user.setCoverPhoto(uploadedImageUrl);
-                            updateUserProfile();
                         }
                     }
                     @Override
@@ -157,7 +156,6 @@ public class EditProfileFragment extends Fragment {
     private void updateUserProfile() {
         Map<String, Object> userUpdates = new HashMap<>();
         userUpdates.put("name", binding.editName.getText().toString());
-        userUpdates.put("birthday", binding.editBirthday.getText().toString());
         userUpdates.put("address", binding.editAddress.getText().toString());
         userUpdates.put("profession",binding.editProfession.getText().toString());
         userUpdates.put("workAt",binding.editWorkAt.getText().toString());

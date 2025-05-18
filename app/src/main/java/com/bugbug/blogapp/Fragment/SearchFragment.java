@@ -30,9 +30,6 @@ import java.util.Collections;
 
 public class SearchFragment extends Fragment {
     private static final long DEBOUNCE_DELAY = 500;
-    private static final int INITIAL_LOAD_COUNT = 10;
-    private static final int LOAD_MORE_COUNT = 5;
-
     FragmentSearchBinding binding;
     BottomNavigationView bottomNav;
 
@@ -44,9 +41,6 @@ public class SearchFragment extends Fragment {
 
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-    private boolean isLoading = false;
-    private String lastKey = null;
-    private boolean isLastPage = false;
 
     public SearchFragment() {
     }
@@ -68,18 +62,7 @@ public class SearchFragment extends Fragment {
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(userAdapter);
 
-        // Add scroll listener for loading more users
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (!isLoading && !isLastPage && !recyclerView.canScrollVertically(1)) {
-                    loadMoreUsers();
-                }
-            }
-        });
-
-        loadTopUsers(INITIAL_LOAD_COUNT, null);
+        loadTopUsers();
 
         binding.searchBar.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -176,58 +159,29 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void loadTopUsers(int limit, String startAfter) {
-        if (isLoading || isLastPage) return;
-
-        isLoading = true;
-        Query query = database.getReference().child("Users")
+    private void loadTopUsers() {
+        database.getReference().child("Users")
                 .orderByChild("numberFollower")
-                .limitToLast(limit);
-
-        if (startAfter != null) {
-            query = query.endAt(Double.parseDouble(startAfter));
-        }
-
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<User> tempList = new ArrayList<>();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    if (user != null && !user.getUserID().equals(FirebaseAuth.getInstance().getUid())) {
-                        tempList.add(user);
-                        if (lastKey == null || user.getNumberFollower() < Double.parseDouble(lastKey)) {
-                            lastKey = String.valueOf(user.getNumberFollower());
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        topUsersList.clear();
+                        list.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            User user = dataSnapshot.getValue(User.class);
+                            if (user != null && !user.getUserID().equals(FirebaseAuth.getInstance().getUid())) {
+                                topUsersList.add(user);
+                            }
                         }
+                        Collections.reverse(topUsersList);
+                        list.addAll(topUsersList);
+                        userAdapter.notifyDataSetChanged();
                     }
-                }
 
-                if (tempList.size() < limit) {
-                    isLastPage = true;
-                }
-
-                Collections.reverse(tempList);
-                if (startAfter == null) {
-                    topUsersList.clear();
-                    topUsersList.addAll(tempList);
-                    list.clear();
-                    list.addAll(topUsersList);
-                } else {
-                    topUsersList.addAll(tempList);
-                    list.addAll(tempList);
-                }
-                userAdapter.notifyDataSetChanged();
-                isLoading = false;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                isLoading = false;
-            }
-        });
-    }
-
-    private void loadMoreUsers() {
-        loadTopUsers(LOAD_MORE_COUNT, lastKey);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        // handle error if needed
+                    }
+                });
     }
 }
