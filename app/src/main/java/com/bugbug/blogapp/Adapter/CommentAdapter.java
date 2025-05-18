@@ -1,5 +1,6 @@
 package com.bugbug.blogapp.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.R;
 import com.bugbug.blogapp.databinding.CommentSampleBinding;
 import com.github.marlonlom.utilities.timeago.TimeAgo;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -51,8 +53,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewHold
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
+
         Comment comment = list.get(position);
         String commentId=comment.getCommentId();
+        if(!comment.getCommentedBy().equals(auth.getUid())){
+            holder.binding.menu.setVisibility(View.GONE);
+        }
         String time= TimeAgo.using(comment.getCommentAt());
         holder.binding.name.setText(comment.getCommentByName());
         holder.binding.comment.setText(comment.getCommentBody());
@@ -102,6 +108,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewHold
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
+        });
+        holder.binding.menu.setOnClickListener(v -> {
+            new AlertDialog.Builder(context)
+                    .setTitle("Delete comment")
+                    .setMessage("Are you sure you want to delete this comment?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        deleteComment(commentId);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
     }
 
@@ -153,6 +169,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.viewHold
                     .push()
                     .setValue(notification);
         }
+    }
+    private void deleteComment(String commentId){
+        database.getReference()
+                .child("Comments")
+                .child(postId)
+                .child(commentId)
+                .removeValue();
     }
 
     public class viewHolder extends RecyclerView.ViewHolder {
