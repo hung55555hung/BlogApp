@@ -3,6 +3,7 @@ package com.bugbug.blogapp.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,11 +28,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        boolean isFirstTime = prefs.getBoolean("isFirstTime", true);
+        boolean isFirstTime = prefs.getBoolean("isFirstTime", false);
+        Log.d("LoginActivity", "isFirstTime: " + isFirstTime);
 
-        if (isFirstTime) {
+        if (!isFirstTime) {
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("isFirstTime", false);
+            editor.putBoolean("isFirstTime", true);
             editor.apply();
 
             Intent intent = new Intent(this, IntroActivity.class);
