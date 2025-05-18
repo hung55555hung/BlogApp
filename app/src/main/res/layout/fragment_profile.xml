@@ -120,7 +120,7 @@
                     android:paddingBottom="4dp">
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/textViewFollower"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -138,9 +138,9 @@
                         android:text="5332"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_16font_mdp"
-                        diagonal:layout_constraintEnd_toEndOf="@+id/textView5"
-                        diagonal:layout_constraintStart_toStartOf="@+id/textView5"
-                        diagonal:layout_constraintTop_toBottomOf="@+id/textView5" />
+                        diagonal:layout_constraintEnd_toEndOf="@+id/textViewFollower"
+                        diagonal:layout_constraintStart_toStartOf="@+id/textViewFollower"
+                        diagonal:layout_constraintTop_toBottomOf="@+id/textViewFollower" />
 
                     <View
                         android:id="@+id/view4"
@@ -148,13 +148,13 @@
                         android:layout_height="0dp"
                         android:background="#A6A5A5"
                         diagonal:layout_constraintBottom_toBottomOf="parent"
-                        diagonal:layout_constraintEnd_toStartOf="@+id/textView3"
+                        diagonal:layout_constraintEnd_toStartOf="@+id/textViewFollowing"
                         diagonal:layout_constraintHorizontal_bias="0.5"
-                        diagonal:layout_constraintStart_toEndOf="@+id/textView5"
-                        diagonal:layout_constraintTop_toTopOf="@+id/textView5" />
+                        diagonal:layout_constraintStart_toEndOf="@+id/textViewFollower"
+                        diagonal:layout_constraintTop_toTopOf="@+id/textViewFollower" />
 
                     <TextView
-                        android:id="@+id/textView3"
+                        android:id="@+id/textViewFollowing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#FFFFFF"
@@ -172,9 +172,9 @@
                         android:text="232"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_16font_mdp"
-                        diagonal:layout_constraintEnd_toEndOf="@+id/textView3"
-                        diagonal:layout_constraintStart_toStartOf="@+id/textView3"
-                        diagonal:layout_constraintTop_toBottomOf="@+id/textView3" />
+                        diagonal:layout_constraintEnd_toEndOf="@+id/textViewFollowing"
+                        diagonal:layout_constraintStart_toStartOf="@+id/textViewFollowing"
+                        diagonal:layout_constraintTop_toBottomOf="@+id/textViewFollowing" />
 
                     <View
                         android:id="@+id/view5"
@@ -184,8 +184,8 @@
                         diagonal:layout_constraintBottom_toBottomOf="parent"
                         diagonal:layout_constraintEnd_toStartOf="@+id/textView4"
                         diagonal:layout_constraintHorizontal_bias="0.5"
-                        diagonal:layout_constraintStart_toEndOf="@+id/textView3"
-                        diagonal:layout_constraintTop_toTopOf="@+id/textView3" />
+                        diagonal:layout_constraintStart_toEndOf="@+id/textViewFollowing"
+                        diagonal:layout_constraintTop_toTopOf="@+id/textViewFollowing" />
 
                     <TextView
                         android:id="@+id/textView4"

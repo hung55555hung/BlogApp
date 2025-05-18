@@ -6,10 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bugbug.blogapp.Model.Story;
 import com.bugbug.blogapp.Model.User;
 import com.bugbug.blogapp.Model.UserStories;
@@ -21,9 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
-
 import omari.hamza.storyview.StoryView;
 import omari.hamza.storyview.callback.StoryClickListeners;
 import omari.hamza.storyview.model.MyStory;
@@ -34,14 +33,13 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     ArrayList<Story> storyList;
     Context context;
+    OnCreateStoryClickListener listener;
 
     public interface OnCreateStoryClickListener {
         void onCreateStoryClicked();
     }
 
-    OnCreateStoryClickListener listener;
-
-    public StoryAdapter(ArrayList<Story> storyList, Context context,  OnCreateStoryClickListener listener) {
+    public StoryAdapter(ArrayList<Story> storyList, Context context, OnCreateStoryClickListener listener) {
         this.storyList = storyList;
         this.context = context;
         this.listener = listener;
@@ -73,39 +71,37 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             createHolder.textView.setText("Create a Story");
         } else {
             StoryViewHolder storyHolder = (StoryViewHolder) holder;
-            if(story.getStories() == null || story.getStories().isEmpty()){
+            ArrayList<UserStories> stories = story.getStories();
+            if (stories == null || stories.isEmpty()) {
                 return;
             }
-            UserStories latestStory = story.getStories().get(story.getStories().size() - 1);
+            UserStories latestStory = stories.get(stories.size() - 1);
             Picasso.get()
                     .load(latestStory.getImage())
                     .placeholder(R.drawable.placeholder)
                     .into(storyHolder.binding.story);
+
             FirebaseDatabase.getInstance().getReference()
                     .child("Users")
-                    .child(story.getStoryBy()).addValueEventListener(new ValueEventListener() {
+                    .child(story.getStoryBy()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             User user = snapshot.getValue(User.class);
-                            String coverPhoto=user.getCoverPhoto();
-                            if (coverPhoto == null || coverPhoto.isEmpty()) {
-                                storyHolder.binding.profileImage.setImageResource(R.drawable.avatar_default);
-                            } else {
-                                Picasso.get()
-                                        .load(coverPhoto)
-                                        .placeholder(R.drawable.avatar_default)
-                                        .into(storyHolder.binding.profileImage);
-                            }
-                            storyHolder.binding.name.setText(user.getName());
-                            storyHolder.binding.story.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
+                            if (user != null) {
+                                String coverPhoto = user.getCoverPhoto();
+                                if (coverPhoto == null || coverPhoto.isEmpty()) {
+                                    storyHolder.binding.profileImage.setImageResource(R.drawable.avatar_default);
+                                } else {
+                                    Picasso.get()
+                                            .load(coverPhoto)
+                                            .placeholder(R.drawable.avatar_default)
+                                            .into(storyHolder.binding.profileImage);
+                                }
+                                storyHolder.binding.name.setText(user.getName());
+                                storyHolder.binding.story.setOnClickListener(v -> {
                                     ArrayList<MyStory> myStories = new ArrayList<>();
-
-                                    for(UserStories stories: story.getStories()){
-                                        myStories.add(new MyStory(
-                                                stories.getImage()
-                                        ));
+                                    for (UserStories userStory : stories) {
+                                        myStories.add(new MyStory(userStory.getImage()));
                                     }
                                     new StoryView.Builder(((AppCompatActivity) context).getSupportFragmentManager())
                                             .setStoriesList(myStories)
@@ -116,25 +112,23 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                             .setStoryClickListeners(new StoryClickListeners() {
                                                 @Override
                                                 public void onDescriptionClickListener(int position) {
-                                                    //your action
                                                 }
 
                                                 @Override
                                                 public void onTitleIconClickListener(int position) {
-                                                    //your action
                                                 }
-                                            }) // Optional Listeners
-                                            .build() // Must be called before calling show method
+                                            })
+                                            .build()
                                             .show();
-                                }
-                            });
+                                });
+                            }
                         }
+
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-
+                            Toast.makeText(context, "Lỗi tải thông tin user", Toast.LENGTH_SHORT).show();
                         }
                     });
-
         }
     }
 
@@ -153,7 +147,6 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             storyImage = itemView.findViewById(R.id.addStory);
             addIcon = itemView.findViewById(R.id.btn_create_story);
             textView = itemView.findViewById(R.id.textView2);
-            storyImage = itemView.findViewById(R.id.addStory);
             storyImage.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onCreateStoryClicked();
@@ -168,7 +161,6 @@ public class StoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public StoryViewHolder(@NonNull View itemView) {
             super(itemView);
             binding = StoryRvDesignBinding.bind(itemView);
-
         }
     }
 }

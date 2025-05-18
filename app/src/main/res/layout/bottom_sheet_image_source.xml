@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <!-- Tùy chọn chụp ảnh từ camera -->
+    <LinearLayout
+        android:id="@+id/option_camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/baseline_camera_alt_24"
+            android:contentDescription="Camera" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chụp ảnh"
+            android:textSize="@dimen/_14font_mdp"
+            android:paddingStart="16dp" />
+    </LinearLayout>
+
+    <!-- Tùy chọn chọn ảnh từ thư viện -->
+    <LinearLayout
+        android:id="@+id/option_gallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/baseline_photo_library_24"
+            android:contentDescription="Gallery" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn từ thư viện"
+            android:textSize="@dimen/_14font_mdp"
+            android:paddingStart="16dp" />
+    </LinearLayout>
+</LinearLayout>
