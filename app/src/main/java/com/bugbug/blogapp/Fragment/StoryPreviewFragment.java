@@ -50,6 +50,7 @@ public class StoryPreviewFragment extends Fragment {
 
         if (imageUri != null) {
             Picasso.get().load(imageUri).into(binding.previewImage);
+            binding.btnPost.setEnabled(true);
         } else {
             Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
             requireActivity().getSupportFragmentManager().popBackStack();

@@ -204,7 +204,7 @@ public class HomeFragment extends Fragment {
 
     private void loadStories(StoryAdapter storyAdapter) {
         String currentUserId = auth.getUid();
-        database.getReference().child("Following").child(currentUserId)
+        database.getReference().child("Followings").child(currentUserId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
